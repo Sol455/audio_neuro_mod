@@ -1,31 +1,13 @@
 cmake_minimum_required(VERSION 3.24)
 
 # Change to your project name
-project(SimpleJucePluginTemplate VERSION 0.0.1)
-
+project(audio_neuro_mod VERSION 0.1.0)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_XCODE_GENERATE_SCHEME OFF)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-# We're going to use CPM as our package manager to bring in JUCE
-# Check to see if we have CPM installed already.  Bring it in if we don't.
-set(CPM_DOWNLOAD_VERSION 0.34.0)
-set(CPM_DOWNLOAD_LOCATION "${CMAKE_BINARY_DIR}/cmake/CPM_${CPM_DOWNLOAD_VERSION}.cmake")
-
-if (NOT EXISTS ${CPM_DOWNLOAD_LOCATION})
-    message(STATUS "Downloading CPM.cmake to ${CPM_DOWNLOAD_LOCATION}")
-    file(DOWNLOAD https://github.com/cpm-cmake/CPM.cmake/releases/download/v${CPM_DOWNLOAD_VERSION}/CPM.cmake ${CPM_DOWNLOAD_LOCATION})
-endif ()
-
-include(${CPM_DOWNLOAD_LOCATION})
-
-# Bring in JUCE locally
-CPMAddPackage(
-    NAME juce
-    GIT_REPOSITORY https://github.com/juce-framework/JUCE.git
-    GIT_TAG origin/master
-)
+add_subdirectory(external/JUCE)
 
 # Make sure you include any new source files here
 set(SourceFiles
@@ -37,7 +19,8 @@ set(SourceFiles
 
 # Change these to your own preferences
 juce_add_plugin(${PROJECT_NAME}
-        COMPANY_NAME theaudioprogrammer
+        COMPANY_NAME sol
+        BUNDLE_ID com.solharter.audio_neuro_mod
         IS_SYNTH FALSE
         NEEDS_MIDI_INPUT FALSE
         NEEDS_MIDI_OUTPUT FALSE
@@ -48,7 +31,7 @@ juce_add_plugin(${PROJECT_NAME}
         PLUGIN_MANUFACTURER_CODE Tap1
         PLUGIN_CODE Reg0
         FORMATS VST3 AU Standalone
-        PRODUCT_NAME "TapPluginTemplate"        
+        PRODUCT_NAME "AudioNeuroMod"
 )
 
 # How we want our SourceFiles to appear in our IDE
