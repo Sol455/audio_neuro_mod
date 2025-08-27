@@ -3,18 +3,22 @@ cmake_minimum_required(VERSION 3.24)
 # Change to your project name
 project(audio_neuro_mod VERSION 0.1.0)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_XCODE_GENERATE_SCHEME OFF)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 add_subdirectory(external/JUCE)
 
+set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Source)
+
 # Make sure you include any new source files here
 set(SourceFiles
-        Source/PluginEditor.cpp
-        Source/PluginEditor.h
-        Source/PluginProcessor.cpp
-        Source/PluginProcessor.h
+        ${SRC_DIR}/PluginEditor.cpp
+        ${SRC_DIR}/PluginEditor.h
+        ${SRC_DIR}/PluginProcessor.cpp
+        ${SRC_DIR}/PluginProcessor.h
+        ${SRC_DIR}/Carrier.cpp
+        ${SRC_DIR}/Carrier.h
 )
 
 # Change these to your own preferences
