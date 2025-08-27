@@ -17,7 +17,7 @@ public:
     Carrier() = default;
 
     /** Prepare with a ProcessSpec */
-    void prepare (const juce::dsp::ProcessSpec& spec);
+    void prepare (const juce::dsp::ProcessSpec& s);
 
     /** Render into buffer (overwrites contents). */
     void process (juce::AudioBuffer<float>& buffer);
@@ -35,7 +35,7 @@ private:
     juce::dsp::ProcessSpec spec { 48000.0, 512, 2 };
     std::vector<juce::dsp::Oscillator<float>> oscillators;
 
-    float amplitude   = 0.2f;
+    float amplitude   = 0.5f;
     float frequencyHz = 440.0f;
 };
 

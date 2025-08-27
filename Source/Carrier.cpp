@@ -49,5 +49,5 @@ void Carrier::setFrequency (float newFreqHz)
 {
     frequencyHz = juce::jmax (0.0f, newFreqHz);
     for (auto& osc : oscillators)
-        osc.setFrequency (frequencyHz); 
+        osc.setFrequency (frequencyHz);
 }

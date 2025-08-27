@@ -140,9 +140,8 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     const float freq = paramsCache.freq->load();
     const float gain = paramsCache.gain->load();
 
-    //auto g = apvts.getRawParameterValue("FREQ");
-    std::cout << gain << std::endl;
-    std::cout << freq << std::endl;
+    // std::cout << gain << std::endl;
+    // std::cout << freq << std::endl;
 
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());

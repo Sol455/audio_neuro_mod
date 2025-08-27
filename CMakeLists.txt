@@ -9,6 +9,8 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 add_subdirectory(external/JUCE)
 
+add_subdirectory(extern/liblsl)
+
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Source)
 
 # Make sure you include any new source files here
@@ -69,5 +71,6 @@ target_link_libraries(${PROJECT_NAME}
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags
         juce::juce_recommended_warning_flags
+        lsl
 )
 
