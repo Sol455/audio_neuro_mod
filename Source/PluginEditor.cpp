@@ -6,8 +6,38 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     : AudioProcessorEditor (&p), processorRef (p)
 {
     juce::ignoreUnused (processorRef);
-    // Make sure that before the constructor has finished, you've set the
-    // editor's size to whatever you need it to be.
+    addAndMakeVisible(freqSlider);
+    addAndMakeVisible(gainSlider);
+
+    freqSlider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
+    gainSlider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
+
+    freqSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 100, 50);
+    gainSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 100, 50);
+
+    gainSliderAttachment  = std::make_unique<SliderAttachment>(processorRef.apvts, Params::IDs::Gain.getParamID()
+, gainSlider);
+    freqSliderAttachment  = std::make_unique<SliderAttachment>(processorRef.apvts, Params::IDs::Freq.getParamID()
+, freqSlider);
+
+    playButton.setButtonText("Playing");
+    playButton.setToggleState(true, juce::NotificationType::dontSendNotification);
+    playButton.setClickingTogglesState(true);
+
+    playButton.onClick = [this]() {
+        const bool isPlaying = playButton.getToggleState();
+        playButton.setButtonText( isPlaying ? "Playing" : "Bypassed" );
+    };
+
+    addAndMakeVisible(playButton);
+
+    freqLabel.setColour(juce::Label::ColourIds::outlineColourId, juce::Colours::white);
+    freqLabel.setJustificationType(juce::Justification::centred);
+    addAndMakeVisible(freqLabel);
+    gainLabel.setColour(juce::Label::ColourIds::outlineColourId, juce::Colours::white);
+    gainLabel.setJustificationType(juce::Justification::centred);
+    addAndMakeVisible(gainLabel);
+
     setSize (800, 500);
 }
 
@@ -28,6 +58,13 @@ void AudioPluginAudioProcessorEditor::paint (juce::Graphics& g)
 
 void AudioPluginAudioProcessorEditor::resized()
 {
+    freqLabel.setBounds(getWidth()/ 2 - 50, getHeight()/2 - 120 , 100, 20);
+    freqSlider.setBounds(getWidth()/ 2 - 50, getHeight()/2 - 100 , 100, 200);
+    gainSlider.setBounds(getWidth()/ 2 - 150, getHeight()/2 - 100 , 100, 200);
+    gainLabel.setBounds(getWidth()/ 2 - 150, getHeight()/2 - 120 , 100, 20);
+    playButton.setBounds(getWidth()/ 2 - 50, getHeight()/2 + 120 , 100, 20);
+
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
 }
+

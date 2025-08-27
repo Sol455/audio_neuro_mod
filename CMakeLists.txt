@@ -19,6 +19,7 @@ set(SourceFiles
         ${SRC_DIR}/PluginProcessor.h
         ${SRC_DIR}/Carrier.cpp
         ${SRC_DIR}/Carrier.h
+        ${SRC_DIR}/Params.h
 )
 
 # Change these to your own preferences
