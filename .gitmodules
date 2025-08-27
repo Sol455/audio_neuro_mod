@@ -1,6 +1,6 @@
 [submodule "external/JUCE"]
 	path = external/JUCE
 	url = https://github.com/juce-framework/JUCE.git
-[submodule "extern/liblsl"]
-	path = extern/liblsl
+[submodule "external/liblsl"]
+	path = external/liblsl
 	url = https://github.com/sccn/liblsl.git
