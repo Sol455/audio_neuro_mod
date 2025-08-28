@@ -141,20 +141,20 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     const float freq = paramsCache.freq->load();
     const float gain = paramsCache.gain->load();
 
-    int samples_to_read = 10;
-    DBG ("EEG BUF Available " << eegRing.available());
-    if ( eegRing.available() >= samples_to_read) {
-        auto readView = eegRing.beginRead (samples_to_read);
+    int samples_to_read = 1;
+    //DBG ("EEG BUF Available " << eegInletRing.available());
+    if ( dspOutletRing.available() >= samples_to_read) {
+        auto readView = dspOutletRing.beginRead (samples_to_read);
         int read = 0;
         for (int i = 0; i < readView.n1; i++) {
             DBG ("EEG: " << readView.p1[i].value << "  ts=" << readView.p1[i].stamp);
             read++;
         }
         for (int i = 0; i < readView.n2; i++) {
-            DBG ("EEG: " << readView.p1[i].value << "  ts=" << readView.p1[i].stamp);
+            DBG ("EEG: " << readView.p2[i].value << "  ts=" << readView.p2[i].stamp);
             read++;
         }
-        eegRing.finishRead(read);
+        dspOutletRing.finishRead(read);
     }
 
     // std::cout << gain << std::endl;

@@ -6,6 +6,7 @@
 #include "lsl/lsl_connector.h"
 #include "lsl/lsl_worker.h"
 #include "lsl/eegRingBuffer.h"
+#include "dsp_worker.h"
 
 
 //==============================================================================
@@ -53,12 +54,14 @@ public:
     bool connectLsl()   { return lsl_connector.connectFirstEEG(); }
     void disconnectLsl(){ lsl_connector.disconnect(); }
     bool lslConnected() const { return lsl_connector.isConnected(); }
-    void lsl_stream() {lslWorker.setInlet (lsl_connector.inlet()); lslWorker.setChannel(55); lslWorker.startWorker();}
+    void lsl_stream() {lslWorker.setInlet (lsl_connector.inlet()); lslWorker.setChannel(55); lslWorker.startWorker(); dspWorker.startWorker();}
 
 private:
     LslConnector lsl_connector;
-    EegRingBuffer eegRing { 1 << 14 };
-    LslWorker     lslWorker { eegRing };
+    EegRingBuffer eegInletRing { 1 << 14 };
+    EegRingBuffer dspOutletRing { 1 << 14 };
+    LslWorker lslWorker { eegInletRing };
+    DSPWorker dspWorker { eegInletRing , dspOutletRing};
     Carrier carrier;
     Params::Cache paramsCache;
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();

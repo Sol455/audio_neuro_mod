@@ -25,6 +25,8 @@ set(SourceFiles
         ${SRC_DIR}/lsl/lsl_connector.h
         ${SRC_DIR}/lsl/eegRingBuffer.h
         ${SRC_DIR}/lsl/lsl_worker.h
+        ${SRC_DIR}/dsp_worker.cpp
+        ${SRC_DIR}/dsp_worker.h
 )
 
 # Change these to your own preferences

@@ -34,7 +34,6 @@ private:
             auto* in = inlet.load (std::memory_order_acquire);
             if (! in) { juce::Thread::yield(); continue; }
 
-            // Discover channel count lazily
             if (chCount <= 0)
             {
                 try { chCount = in->info().channel_count(); }
