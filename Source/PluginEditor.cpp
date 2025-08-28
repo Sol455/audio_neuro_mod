@@ -6,8 +6,8 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     : AudioProcessorEditor (&p), processorRef (p)
 {
     juce::ignoreUnused (processorRef);
-    addAndMakeVisible(freqSlider);
-    addAndMakeVisible(gainSlider);
+    // addAndMakeVisible(freqSlider);
+    // addAndMakeVisible(gainSlider);
 
     freqSlider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
     gainSlider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
@@ -46,6 +46,11 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     gainLabel.setJustificationType(juce::Justification::centred);
     addAndMakeVisible(gainLabel);
 
+    addAndMakeVisible (scope);
+    scope.setAutoscale (true);
+
+    scope.setSource (&processorRef.getUiRing(), 160.0);
+
     setSize (800, 500);
 }
 
@@ -81,8 +86,10 @@ void AudioPluginAudioProcessorEditor::resized()
     freqSlider.setBounds(getWidth()/ 2 - 50, getHeight()/2 - 100 , 100, 200);
     gainSlider.setBounds(getWidth()/ 2 - 150, getHeight()/2 - 100 , 100, 200);
     gainLabel.setBounds(getWidth()/ 2 - 150, getHeight()/2 - 120 , 100, 20);
-    connectButton.setBounds(getWidth()/ 2 - 150, getHeight()/2 + 120 , 100, 50);
-    streamButton.setBounds(getWidth()/ 2 - 50, getHeight()/2 + 120 , 100, 50);
+    connectButton.setBounds(getWidth()/ 2 - 150, getHeight()/2 + 150 , 100, 50);
+    streamButton.setBounds(getWidth()/ 2 - 50, getHeight()/2 + 150 , 100, 50);
+
+    scope.setBounds (getLocalBounds().withSizeKeepingCentre (700, 300));
 
 
     // This is generally where you'll want to lay out the positions of any

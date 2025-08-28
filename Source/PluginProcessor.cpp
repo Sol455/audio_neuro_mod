@@ -216,6 +216,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout AudioPluginAudioProcessor::c
     juce::NormalisableRange<float>(0.f, 10000.f, 10.0), 400.0f));
 
     params.push_back(std::make_unique<juce::AudioParameterFloat>(Params::IDs::Gain, "Gain",
-    juce::NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.2f));
+    juce::NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.0f));
     return { params.begin(), params.end() };
 }

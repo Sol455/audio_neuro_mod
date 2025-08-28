@@ -29,6 +29,7 @@ set(SourceFiles
         ${SRC_DIR}/dsp_worker.h
         ${SRC_DIR}/filterMod.cpp
         ${SRC_DIR}/filterMod.h
+        ${SRC_DIR}/EegScopeComponent.h
 )
 
 # Change these to your own preferences

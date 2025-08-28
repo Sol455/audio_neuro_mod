@@ -15,8 +15,8 @@
 class DSPWorker : private juce::Thread
 {
 public:
-    explicit DSPWorker (EegRingBuffer& src, EegRingBuffer& dst)
-        : juce::Thread ("DSP Worker"), source (src), dest (dst) {}
+    explicit DSPWorker (EegRingBuffer& src, EegRingBuffer& dst, EegRingBuffer& ui)
+        : juce::Thread ("DSP Worker"), source (src), dest (dst), uidest (ui){}
     void prepare(double eegFs, double centreHz = 10.0, double Q = 2.0);
 
     void startWorker() { if (! isThreadRunning()) startThread (Priority::high); }
@@ -29,6 +29,7 @@ private:
 
     EegRingBuffer &source;
     EegRingBuffer &dest;
+    EegRingBuffer &uidest;
     filterMod filtermod;
 };
 

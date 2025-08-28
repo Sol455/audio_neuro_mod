@@ -1,6 +1,7 @@
 #pragma once
 
 #include "PluginProcessor.h"
+#include "EegScopeComponent.h"
 
 //==============================================================================
 class AudioPluginAudioProcessorEditor final : public juce::AudioProcessorEditor
@@ -15,6 +16,7 @@ public:
 
 private:
     void updateConnectButtonState();
+    EegScopeComponent scope;
     juce::Slider freqSlider, gainSlider;
     using SliderAttachment = juce::AudioProcessorValueTreeState::SliderAttachment;
     std::unique_ptr<SliderAttachment> freqSliderAttachment, gainSliderAttachment;

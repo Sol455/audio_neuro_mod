@@ -55,13 +55,15 @@ public:
     void disconnectLsl(){ lsl_connector.disconnect(); }
     bool lslConnected() const { return lsl_connector.isConnected(); }
     void lsl_stream() {lslWorker.setInlet (lsl_connector.inlet()); lslWorker.setChannel(55); lslWorker.startWorker(); dspWorker.prepare(160.0f, 10.0f, 2.0f); dspWorker.startWorker();}
+    EegRingBuffer& getUiRing() { return uiOutletRing; }
 
 private:
     LslConnector lsl_connector;
     EegRingBuffer eegInletRing { 1 << 14 };
     EegRingBuffer dspOutletRing { 1 << 14 };
+    EegRingBuffer uiOutletRing { 1 << 14 };
     LslWorker lslWorker { eegInletRing };
-    DSPWorker dspWorker { eegInletRing , dspOutletRing};
+    DSPWorker dspWorker { eegInletRing , dspOutletRing, uiOutletRing};
     Carrier carrier;
     Params::Cache paramsCache;
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
