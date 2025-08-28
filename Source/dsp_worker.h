@@ -10,12 +10,14 @@
 #include <atomic>
 #include <vector>
 #include "lsl/EegRingBuffer.h"
+#include "filterMod.h"
 
 class DSPWorker : private juce::Thread
 {
 public:
     explicit DSPWorker (EegRingBuffer& src, EegRingBuffer& dst)
         : juce::Thread ("DSP Worker"), source (src), dest (dst) {}
+    void prepare(double eegFs, double centreHz = 10.0, double Q = 2.0);
 
     void startWorker() { if (! isThreadRunning()) startThread (Priority::high); }
     void stopWorker()  { signalThreadShouldExit(); stopThread (1500); }
@@ -27,6 +29,7 @@ private:
 
     EegRingBuffer &source;
     EegRingBuffer &dest;
+    filterMod filtermod;
 };
 
 

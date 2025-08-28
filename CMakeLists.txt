@@ -27,6 +27,8 @@ set(SourceFiles
         ${SRC_DIR}/lsl/lsl_worker.h
         ${SRC_DIR}/dsp_worker.cpp
         ${SRC_DIR}/dsp_worker.h
+        ${SRC_DIR}/filterMod.cpp
+        ${SRC_DIR}/filterMod.h
 )
 
 # Change these to your own preferences

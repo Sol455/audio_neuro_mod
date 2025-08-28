@@ -54,7 +54,7 @@ public:
     bool connectLsl()   { return lsl_connector.connectFirstEEG(); }
     void disconnectLsl(){ lsl_connector.disconnect(); }
     bool lslConnected() const { return lsl_connector.isConnected(); }
-    void lsl_stream() {lslWorker.setInlet (lsl_connector.inlet()); lslWorker.setChannel(55); lslWorker.startWorker(); dspWorker.startWorker();}
+    void lsl_stream() {lslWorker.setInlet (lsl_connector.inlet()); lslWorker.setChannel(55); lslWorker.startWorker(); dspWorker.prepare(160.0f, 10.0f, 2.0f); dspWorker.startWorker();}
 
 private:
     LslConnector lsl_connector;
