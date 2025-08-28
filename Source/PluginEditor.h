@@ -14,15 +14,14 @@ public:
     void resized() override;
 
 private:
-    // This reference is provided as a quick way for your editor to
-    // access the processor object that created it.
+    void updateConnectButtonState();
     juce::Slider freqSlider, gainSlider;
     using SliderAttachment = juce::AudioProcessorValueTreeState::SliderAttachment;
     std::unique_ptr<SliderAttachment> freqSliderAttachment, gainSliderAttachment;
 
     juce::Label freqLabel {"freqLabel", "Frequency"};
     juce::Label gainLabel {"gainLabel", "Gain"};
-    juce::TextButton playButton;
+    juce::TextButton connectButton;
 
     AudioPluginAudioProcessor& processorRef;
 

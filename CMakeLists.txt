@@ -9,7 +9,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 add_subdirectory(external/JUCE)
 
-add_subdirectory(extern/liblsl)
+add_subdirectory(external/liblsl)
 
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Source)
 
@@ -22,6 +22,7 @@ set(SourceFiles
         ${SRC_DIR}/Carrier.cpp
         ${SRC_DIR}/Carrier.h
         ${SRC_DIR}/Params.h
+        ${SRC_DIR}/lsl/lsl_connector.h
 )
 
 # Change these to your own preferences

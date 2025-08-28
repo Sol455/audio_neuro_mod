@@ -100,6 +100,7 @@ void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 
 void AudioPluginAudioProcessor::releaseResources()
 {
+    disconnectLsl();
     // When playback stops, you can use this as an opportunity to free up any
     // spare memory, etc.
 }

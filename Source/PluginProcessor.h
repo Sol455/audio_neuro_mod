@@ -3,6 +3,7 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 #include "Carrier.h"
 #include "Params.h"
+#include "lsl/lsl_connector.h"
 
 
 //==============================================================================
@@ -47,7 +48,12 @@ public:
 
     juce::AudioProcessorValueTreeState apvts;
 
+    bool connectLsl()   { return lsl.connectFirstEEG(); }
+    void disconnectLsl(){ lsl.disconnect(); }
+    bool lslConnected() const { return lsl.isConnected(); }
+
 private:
+    LslConnector lsl;
     Carrier carrier;
     Params::Cache paramsCache;
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();

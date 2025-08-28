@@ -20,16 +20,19 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     freqSliderAttachment  = std::make_unique<SliderAttachment>(processorRef.apvts, Params::IDs::Freq.getParamID()
 , freqSlider);
 
-    playButton.setButtonText("Playing");
-    playButton.setToggleState(true, juce::NotificationType::dontSendNotification);
-    playButton.setClickingTogglesState(true);
+    addAndMakeVisible(connectButton);
+    connectButton.setButtonText("Connect");
+    connectButton.setClickingTogglesState(false);
+    connectButton.onClick = [this]() {
+        if (processorRef.lslConnected())
+            processorRef.disconnectLsl();
+        else
+            processorRef.connectLsl();
 
-    playButton.onClick = [this]() {
-        const bool isPlaying = playButton.getToggleState();
-        playButton.setButtonText( isPlaying ? "Playing" : "Bypassed" );
+        updateConnectButtonState();
     };
 
-    addAndMakeVisible(playButton);
+    addAndMakeVisible(connectButton);
 
     freqLabel.setColour(juce::Label::ColourIds::outlineColourId, juce::Colours::white);
     freqLabel.setJustificationType(juce::Justification::centred);
@@ -39,6 +42,17 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     addAndMakeVisible(gainLabel);
 
     setSize (800, 500);
+}
+
+void AudioPluginAudioProcessorEditor::updateConnectButtonState()
+{
+    if (processorRef.lslConnected()) {
+        connectButton.setButtonText("Disconnect");
+        connectButton.setToggleState(true, juce::dontSendNotification);
+    } else {
+        connectButton.setButtonText("Connect");
+        connectButton.setToggleState(false, juce::dontSendNotification);
+    }
 }
 
 AudioPluginAudioProcessorEditor::~AudioPluginAudioProcessorEditor()
@@ -62,7 +76,7 @@ void AudioPluginAudioProcessorEditor::resized()
     freqSlider.setBounds(getWidth()/ 2 - 50, getHeight()/2 - 100 , 100, 200);
     gainSlider.setBounds(getWidth()/ 2 - 150, getHeight()/2 - 100 , 100, 200);
     gainLabel.setBounds(getWidth()/ 2 - 150, getHeight()/2 - 120 , 100, 20);
-    playButton.setBounds(getWidth()/ 2 - 50, getHeight()/2 + 120 , 100, 20);
+    connectButton.setBounds(getWidth()/ 2 - 50, getHeight()/2 + 120 , 100, 50);
 
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..

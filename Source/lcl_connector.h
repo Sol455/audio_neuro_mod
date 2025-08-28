@@ -1,8 +1,0 @@
-//
-// Created by Sol Harter on 27/08/2025.
-//
-
-#ifndef AUDIO_NEURO_MOD_LCL_CONNECTOR_H
-#define AUDIO_NEURO_MOD_LCL_CONNECTOR_H
-
-#endif //AUDIO_NEURO_MOD_LCL_CONNECTOR_H

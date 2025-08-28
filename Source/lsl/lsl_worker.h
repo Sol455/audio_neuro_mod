@@ -1,0 +1,8 @@
+//
+// Created by Sol Harter on 28/08/2025.
+//
+
+#ifndef AUDIO_NEURO_MOD_LSL_WORKER_H
+#define AUDIO_NEURO_MOD_LSL_WORKER_H
+
+#endif //AUDIO_NEURO_MOD_LSL_WORKER_H
