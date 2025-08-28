@@ -21,7 +21,7 @@ private:
 
     juce::Label freqLabel {"freqLabel", "Frequency"};
     juce::Label gainLabel {"gainLabel", "Gain"};
-    juce::TextButton connectButton;
+    juce::TextButton connectButton, streamButton;
 
     AudioPluginAudioProcessor& processorRef;
 

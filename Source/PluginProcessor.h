@@ -4,6 +4,8 @@
 #include "Carrier.h"
 #include "Params.h"
 #include "lsl/lsl_connector.h"
+#include "lsl/lsl_worker.h"
+#include "lsl/eegRingBuffer.h"
 
 
 //==============================================================================
@@ -48,15 +50,19 @@ public:
 
     juce::AudioProcessorValueTreeState apvts;
 
-    bool connectLsl()   { return lsl.connectFirstEEG(); }
-    void disconnectLsl(){ lsl.disconnect(); }
-    bool lslConnected() const { return lsl.isConnected(); }
+    bool connectLsl()   { return lsl_connector.connectFirstEEG(); }
+    void disconnectLsl(){ lsl_connector.disconnect(); }
+    bool lslConnected() const { return lsl_connector.isConnected(); }
+    void lsl_stream() {lslWorker.setInlet (lsl_connector.inlet()); lslWorker.setChannel(55); lslWorker.startWorker();}
 
 private:
-    LslConnector lsl;
+    LslConnector lsl_connector;
+    EegRingBuffer eegRing { 1 << 14 };
+    LslWorker     lslWorker { eegRing };
     Carrier carrier;
     Params::Cache paramsCache;
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessor)
 };
+

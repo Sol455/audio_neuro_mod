@@ -32,7 +32,12 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
         updateConnectButtonState();
     };
 
-    addAndMakeVisible(connectButton);
+    addAndMakeVisible(streamButton);
+    streamButton.setButtonText("Stream");
+
+    streamButton.onClick = [this]() {
+        processorRef.lsl_stream();
+    };
 
     freqLabel.setColour(juce::Label::ColourIds::outlineColourId, juce::Colours::white);
     freqLabel.setJustificationType(juce::Justification::centred);
@@ -76,7 +81,9 @@ void AudioPluginAudioProcessorEditor::resized()
     freqSlider.setBounds(getWidth()/ 2 - 50, getHeight()/2 - 100 , 100, 200);
     gainSlider.setBounds(getWidth()/ 2 - 150, getHeight()/2 - 100 , 100, 200);
     gainLabel.setBounds(getWidth()/ 2 - 150, getHeight()/2 - 120 , 100, 20);
-    connectButton.setBounds(getWidth()/ 2 - 50, getHeight()/2 + 120 , 100, 50);
+    connectButton.setBounds(getWidth()/ 2 - 150, getHeight()/2 + 120 , 100, 50);
+    streamButton.setBounds(getWidth()/ 2 - 50, getHeight()/2 + 120 , 100, 50);
+
 
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
