@@ -9,7 +9,7 @@
 #include <juce_core/juce_core.h>
 #include <atomic>
 #include <vector>
-#include "lsl/EegRingBuffer.h"
+#include "lsl/eegRingBuffer.h"
 #include "filterMod.h"
 
 class DSPWorker : private juce::Thread
@@ -26,6 +26,12 @@ private:
     void process(const EegSample& sample);
 
     void run() override;
+
+    float madeModSignal(float env_sample);
+
+    double envelope_95_ref = 7.688501426439704;
+    double mod_depth = 0.8f;
+    double mod_min_depth = 0.15f;
 
     EegRingBuffer &source;
     EegRingBuffer &dest;

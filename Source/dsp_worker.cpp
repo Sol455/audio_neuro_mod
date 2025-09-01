@@ -14,9 +14,10 @@ void DSPWorker::process (const EegSample& sample_in)
 
     //DSP Chain here:
 
-    const float mod_value = filtermod.process(sample_in.value);
+    const float filtered_signal = filtermod.process(sample_in.value);
+    const float mod_signal = madeModSignal(filtered_signal);
 
-    const EegSample out { mod_value, sample_in.stamp };
+    const EegSample out { mod_signal, sample_in.stamp };
 
     //const EegSample y { sample.value, sample.stamp };
 
@@ -35,6 +36,30 @@ void DSPWorker::process (const EegSample& sample_in)
     else {
         // Dest Full, Drop one
     }
+}
+
+float DSPWorker::madeModSignal(float sample) {
+
+    //DBG ("Sample in: " << sample);
+
+    // --- Step 1: normalise raw sample -refP95..+refP95 → [0..1]
+
+    float depth = 0.5f * ((sample / 7.688501426439704e-05) + 1.0f);
+
+    // --- Step 2: scale by modulation depth
+    depth *= mod_depth;
+
+    // --- Step 3: clip into [0,1]
+    depth = juce::jlimit(0.0f, 1.0f, depth);
+
+    // --- Step 4: apply min/max modulation depth window
+    float modulator_signal = mod_min_depth + (1.0 - mod_min_depth) * depth;
+
+    // --- Done: 0..1 range with floor/ceiling
+    //DBG ("Sample out: " << modulator_signal);
+
+    return modulator_signal;
+
 }
 
 void DSPWorker::run()

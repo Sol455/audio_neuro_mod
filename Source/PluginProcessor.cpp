@@ -99,8 +99,8 @@ void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
     carrier.prepare(spec);
     midiOut.attachRing(&dspOutletRing);
     midiOut.setChannel(1);
-    midiOut.setCcNumber(74);   // Auto Filter cutoff is commonly mapped to 74
-    midiOut.setRateHz(50.0);   // 50 Hz control rate is a good starting point
+    midiOut.setCcNumber(74);
+    midiOut.setRateHz(160.0);
     midiOut.prepare(sampleRate);
 }
 
