@@ -7,6 +7,7 @@
 #include "lsl/lsl_worker.h"
 #include "lsl/eegRingBuffer.h"
 #include "dsp_worker.h"
+#include "MidiOutputLayer.h"
 
 
 //==============================================================================
@@ -64,6 +65,7 @@ private:
     EegRingBuffer uiOutletRing { 1 << 14 };
     LslWorker lslWorker { eegInletRing };
     DSPWorker dspWorker { eegInletRing , dspOutletRing, uiOutletRing};
+    MidiOutputLayer midiOut;
     Carrier carrier;
     Params::Cache paramsCache;
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
