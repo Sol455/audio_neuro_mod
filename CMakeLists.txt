@@ -31,6 +31,7 @@ set(SourceFiles
         ${SRC_DIR}/filterMod.h
         ${SRC_DIR}/EegScopeComponent.h
         ${SRC_DIR}/MidiOutputLayer.h
+        ${SRC_DIR}/MidiOutputLayer.cpp
 )
 
 # Change these to your own preferences
