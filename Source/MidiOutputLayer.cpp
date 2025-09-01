@@ -13,11 +13,11 @@ void MidiOutputLayer::prepare (double fs)
         if (iacEnabled) openIAC();
         sampleRate = fs;
         samplesPerCc = juce::jmax(1, (int) std::lround(sampleRate / rateHz));
-        samplesUntilNextCc = 0;
+        nextCcSample = 0;
         held = 0.0f;
     }
 
-void MidiOutputLayer::process (int numSamples, juce::MidiBuffer& midi)
+void MidiOutputLayer::process (int numSamples, juce::MidiBuffer& midi, int64_t blockStartSample)
     {
         if (ring != nullptr)
         {
@@ -26,22 +26,23 @@ void MidiOutputLayer::process (int numSamples, juce::MidiBuffer& midi)
                 held = latest;
         }
 
-        for (int i = 0; i < numSamples; ++i)
+        for (int sampleInBlock = 0; sampleInBlock < numSamples; ++sampleInBlock)
         {
-            if (samplesUntilNextCc <= 0)
+            auto currentGlobalSample = blockStartSample + sampleInBlock;
+
+            if (currentGlobalSample >= nextCcSample)
             {
+                auto lookbackSample = currentGlobalSample - lookbackDelaySamples;
                 //DBG ("Latest: " << held);
                 const int v = (int) std::lround(juce::jlimit(0.0f, 1.0f, held) * 127.0f);
                 //DBG ("Midi Out: " << v);
-                // midi.addEvent(juce::MidiMessage::controllerEvent(chan, cc, v), i);
-                if (iacEnabled) sendIAC(v);
+                midi.addEvent(juce::MidiMessage::controllerEvent(chan, cc, v), sampleInBlock);
+                //if (iacEnabled) sendIAC(v);
 
-                samplesUntilNextCc += samplesPerCc;
+                nextCcSample += samplesPerCc;
             }
-            --samplesUntilNextCc;
         }
     }
-
 
 bool MidiOutputLayer::tryReadLatestFromRing (float& out) noexcept
     {

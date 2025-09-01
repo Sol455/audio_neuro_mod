@@ -59,6 +59,7 @@ public:
     EegRingBuffer& getUiRing() { return uiOutletRing; }
 
 private:
+    std::atomic<int64_t> globalSampleCounter{0};
     LslConnector lsl_connector;
     EegRingBuffer eegInletRing { 1 << 14 };
     EegRingBuffer dspOutletRing { 1 << 14 };

@@ -148,26 +148,19 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     const float gain = paramsCache.gain->load();
 
 
-    // int samples_to_read = 1;
-    // //DBG ("EEG BUF Available " << eegInletRing.available());
-    //
-    // if ( dspOutletRing.available() >= samples_to_read) {
-    //     auto readView = dspOutletRing.beginRead (samples_to_read);
-    //     int read = 0;
-    //     for (int i = 0; i < readView.n1; i++) {
-    //         DBG ("EEG: " << readView.p1[i].value << "  ts=" << readView.p1[i].stamp);
-    //         read++;
-    //     }
-    //     for (int i = 0; i < readView.n2; i++) {
-    //         DBG ("EEG: " << readView.p2[i].value << "  ts=" << readView.p2[i].stamp);
-    //         read++;
-    //     }
-    //     dspOutletRing.finishRead(read);
-    // }
+    auto samplesThisBlock = buffer.getNumSamples();
+    auto blockStartSample = globalSampleCounter.load();
+    DBG ("SAMPLECOUNT: " << blockStartSample);
 
-    // std::cout << gain << std::endl;
-    // std::cout << freq << std::endl;
-    midiOut.process(buffer.getNumSamples(),midiMessages);
+
+    // Your audio processing here...
+
+    // Process MIDI output with sample-accurate timing
+    //midiOutput.process(samplesThisBlock, midi, blockStartSample);
+
+    // Update global counter once per block
+
+    midiOut.process(buffer.getNumSamples(),midiMessages, blockStartSample);
 
 
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
@@ -182,6 +175,7 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         carrier.process(buffer);
 
     }
+    globalSampleCounter.store(blockStartSample + samplesThisBlock);
 }
 
 //==============================================================================

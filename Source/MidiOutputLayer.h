@@ -14,15 +14,15 @@
 class MidiOutputLayer
 {
 public:
+    void prepare (double fs);
+    void setDelayms (float ms)              { lookbackDelaySamples = static_cast<int>(ms * sampleRate / 1000); }
     void setIAC (bool toggle)               { iacEnabled = toggle; }
     void attachRing (EegRingBuffer* rb)     { ring = rb; }
     void setChannel (int ch)                { chan = juce::jlimit(1, 16, ch); }
     void setCcNumber (int num)              { cc   = juce::jlimit(0, 127, num); }
     void setRateHz (double hz)              { rateHz = juce::jmax(1.0, hz); }
 
-    void prepare (double fs);
-
-    void process (int numSamples, juce::MidiBuffer& midi);
+    void process (int numSamples, juce::MidiBuffer& midi, int64_t blockStartSample);
 
 private:
     bool tryReadLatestFromRing (float& out) noexcept;
@@ -33,13 +33,15 @@ private:
 
     EegRingBuffer* ring = nullptr;
     int chan = 1, cc = 74;
-    double rateHz = 50.0, sampleRate = 48000.0;
-    int samplesPerCc = 960, samplesUntilNextCc = 0;
+    double rateHz = 50.0, sampleRate = 44000.0;
+    int samplesPerCc = 960;
     float held = 0.0f;
     std::unique_ptr<juce::MidiOutput> iacOut;
     int iacChannel = 1;         // 1..16
     int iacCc      = 74;        // CC number to map (cutoff convention)
     std::atomic<bool> iacEnabled { true };
+    int64_t lookbackDelaySamples = 480;
+    int64_t nextCcSample = 0;
 };
 
 
