@@ -32,17 +32,25 @@ void MidiOutputLayer::process (int numSamples, juce::MidiBuffer& midi, int64_t b
 
             if (currentGlobalSample >= nextCcSample)
             {
+                float eegValue;
                 auto lookbackSample = currentGlobalSample - lookbackDelaySamples;
                 //DBG ("Latest: " << held);
-                const int v = (int) std::lround(juce::jlimit(0.0f, 1.0f, held) * 127.0f);
-                //DBG ("Midi Out: " << v);
-                midi.addEvent(juce::MidiMessage::controllerEvent(chan, cc, v), sampleInBlock);
-                //if (iacEnabled) sendIAC(v);
+                //getEegValueAtSample(lookbackSample, eegValue)
 
+                auto midiValue = scaleEegToMidi(held);
+                auto midiMsg = juce::MidiMessage::controllerEvent(chan, cc, midiValue);
+                midi.addEvent(midiMsg, sampleInBlock);
+                //if (iacEnabled) sendIAC(v);
                 nextCcSample += samplesPerCc;
             }
         }
     }
+
+int MidiOutputLayer::scaleEegToMidi(float eegValue) const
+{
+    const int midi_sample = static_cast<int>(std::lround(juce::jlimit(0.0f, 1.0f, eegValue) * 127.0f));
+    return midi_sample;
+}
 
 bool MidiOutputLayer::tryReadLatestFromRing (float& out) noexcept
     {

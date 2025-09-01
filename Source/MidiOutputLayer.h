@@ -27,6 +27,8 @@ public:
 private:
     bool tryReadLatestFromRing (float& out) noexcept;
 
+    int scaleEegToMidi(float eegValue) const;
+
     void openIAC();
 
     void sendIAC(int value);
