@@ -5,8 +5,8 @@
 #include "Params.h"
 #include "lsl/lsl_connector.h"
 #include "lsl/lsl_worker.h"
-#include "lsl/eegRingBuffer.h"
-#include "lsl/lookBackBuffer.h"
+#include "lsl/EegFIFO.h"
+#include "lsl/EegRingBuf.h"
 #include "lsl/timestampMapper.h"
 #include "dsp_worker.h"
 #include "MidiOutputLayer.h"
@@ -58,7 +58,7 @@ public:
     void disconnectLsl(){ lsl_connector.disconnect(); }
     bool lslConnected() const { return lsl_connector.isConnected(); }
     void lsl_stream() {lslWorker.setInlet (lsl_connector.inlet()); lslWorker.setChannel(55); lslWorker.startWorker(); dspWorker.prepare(160.0f, 10.0f, 2.0f); dspWorker.startWorker();}
-    EegRingBuffer& getUiRing() { return uiOutletRing; }
+    EegFIFO& getUiRing() { return uiOutletFIFO; }
 
 private:
     std::atomic<int64_t> globalSampleCounter{0};
@@ -66,14 +66,13 @@ private:
 
     //EEG Buffers
     timestampMapper stampMapper;
-    EegRingBuffer eegInletRing { 1 << 14 };
-    EegRingBuffer dspOutletRing { 1 << 14 };
-    LookbackBuffer dspLookbackBuffer { 1 << 14 };
-    EegRingBuffer uiOutletRing { 1 << 14 };
+    EegFIFO eegInletFIFO{ 1 << 14 };
+    EegRingBuf dspRingBuffer { 1 << 14 };
+    EegFIFO uiOutletFIFO { 1 << 14 };
 
     //Worker Threads
-    LslWorker lslWorker { eegInletRing, stampMapper};
-    DSPWorker dspWorker { eegInletRing , dspLookbackBuffer, uiOutletRing};
+    LslWorker lslWorker { eegInletFIFO, stampMapper};
+    DSPWorker dspWorker { eegInletFIFO , dspRingBuffer, uiOutletFIFO};
 
     //timestamp drift timer
     void timerCallback() override;

@@ -5,19 +5,18 @@
 #ifndef AUDIO_NEURO_MOD_DSP_WORKER_H
 #define AUDIO_NEURO_MOD_DSP_WORKER_H
 
-#pragma once
 #include <juce_core/juce_core.h>
 #include <atomic>
 #include <vector>
-#include "lsl/eegRingBuffer.h"
+#include "lsl/EegFIFO.h"
 #include "filterMod.h"
-#include "lsl/lookBackBuffer.h"
+#include "lsl/EegRingBuf.h"
 
 class DSPWorker : private juce::Thread
 {
 public:
-    explicit DSPWorker (EegRingBuffer& src, LookbackBuffer& dst, EegRingBuffer& ui)
-        : juce::Thread ("DSP Worker"), source (src), dest (dst), uidest (ui){}
+    explicit DSPWorker (EegFIFO& src, EegRingBuf& dst, EegFIFO& ui)
+        : juce::Thread ("DSP Worker"), sourceFIFO (src), destRING (dst), uiDestFIFO (ui){}
     void prepare(double eegFs, double centreHz = 10.0, double Q = 2.0);
 
     void startWorker() { if (! isThreadRunning()) startThread (Priority::high); }
@@ -34,9 +33,9 @@ private:
     double mod_depth = 0.8f;
     double mod_min_depth = 0.15f;
 
-    EegRingBuffer &source;
-    LookbackBuffer &dest;
-    EegRingBuffer &uidest;
+    EegFIFO &sourceFIFO;
+    EegRingBuf &destRING;
+    EegFIFO &uiDestFIFO;
     filterMod filtermod;
 };
 

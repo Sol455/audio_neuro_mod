@@ -2,22 +2,40 @@
 // Created by Sol Harter on 28/08/2025.
 //
 
-#ifndef AUDIO_NEURO_MOD_EEGRINGBUFFER_H
-#define AUDIO_NEURO_MOD_EEGRINGBUFFER_H
+#ifndef AUDIO_NEURO_MOD_EEGFIFO_H
+#define AUDIO_NEURO_MOD_EEGFIFO_H
 
-#pragma once
 #include <juce_core/juce_core.h>
 #include <vector>
 #include "eegTypes.h"
 
-class EegRingBuffer
+class EegFIFO
 {
 public:
-    explicit EegRingBuffer (int capacitySamples)
-        : fifo (capacitySamples), buffer ((size_t) capacitySamples) {}
+    explicit EegFIFO (int capacitySamples): fifo (capacitySamples), buffer ((size_t) capacitySamples) {}
 
     int capacity()  const noexcept { return (int) buffer.size(); }
     int available() const noexcept { return fifo.getNumReady(); }
+
+    bool addSample(const EegSample& sample) {
+        auto w = beginWrite(1);
+        if (w.total() >= 1) {
+            *w.p1 = sample;
+            finishWrite(1);
+            return true;
+        }
+        return false; // Buffer full
+    }
+
+    bool readSample(EegSample& sample) {
+        auto r = beginRead(1);
+        if (r.total() >= 1) {
+            sample = *r.p1;
+            finishRead(1);
+            return true;
+        }
+        return false; // No data available
+    }
 
     struct WriteView { EegSample* p1{}; int n1{}; EegSample* p2{}; int n2{}; int total() const { return n1 + n2; } };
 
@@ -48,15 +66,15 @@ public:
 
     void finishRead (int consumed) { fifo.finishedRead (consumed); }
 
-    template <typename Fn>
-    int consume (int maxToRead, Fn&& fn)
-    {
-        auto rv = beginRead (maxToRead);
-        for (int i = 0; i < rv.n1; ++i) fn (rv.p1[i]);
-        for (int i = 0; i < rv.n2; ++i) fn (rv.p2[i]);
-        finishRead (rv.total());
-        return rv.total();
-    }
+    // template <typename Fn>
+    // int consume (int maxToRead, Fn&& fn)
+    // {
+    //     auto rv = beginRead (maxToRead);
+    //     for (int i = 0; i < rv.n1; ++i) fn (rv.p1[i]);
+    //     for (int i = 0; i < rv.n2; ++i) fn (rv.p2[i]);
+    //     finishRead (rv.total());
+    //     return rv.total();
+    // }
 
 private:
     juce::AbstractFifo     fifo;

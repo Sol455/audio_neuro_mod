@@ -8,13 +8,13 @@
 // EegScopeComponent.h
 #pragma once
 #include <juce_gui_basics/juce_gui_basics.h>
-#include "./lsl/EegRingBuffer.h"
+#include "./lsl/EegFIFO.h"
 
 class EegScopeComponent : public juce::Component,
                           private juce::Timer
 {
 public:
-    void setSource (EegRingBuffer* rb, double fsHz)
+    void setSource (EegFIFO* rb, double fsHz)
     {
         ring = rb;
         fs   = fsHz;
@@ -85,7 +85,7 @@ private:
         repaint();
     }
 
-    EegRingBuffer* ring = nullptr;
+    EegFIFO* ring = nullptr;
     double fs = 0.0;
     int samplesPerFrame = 256;
     bool autoscale = true;

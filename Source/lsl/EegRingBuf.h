@@ -2,22 +2,21 @@
 // Created by Sol Harter on 01/09/2025.
 //
 
-#ifndef AUDIO_NEURO_MOD_LOOKBACKBUFFER_H
-#define AUDIO_NEURO_MOD_LOOKBACKBUFFER_H
+#ifndef AUDIO_NEURO_MOD_EEGRINGBUF_H
+#define AUDIO_NEURO_MOD_EEGRINGBUF_H
 
 //
 // LookbackBuffer.h - Ring buffer with sample-accurate lookups
 //
 
-#pragma once
 #include <juce_core/juce_core.h>
 #include <vector>
 #include <atomic>
 #include "eegTypes.h"
 
-class LookbackBuffer {
+class EegRingBuf {
 public:
-    explicit LookbackBuffer(int capacitySamples)
+    explicit EegRingBuf(int capacitySamples)
         : buffer(capacitySamples), capacity(capacitySamples) {}
 
     void addSample(const EegSample& sample) {
@@ -74,7 +73,7 @@ public:
         return false; // No valid data found
     }
 
-    // Check if we have data in a reasonable range of the target
+    // Check if we have data near target
     bool hasDataNear(int64_t targetSampleIndex, int64_t maxDistance = 10000) {
         int numValid = validSamples.load();
         if (numValid == 0) return false;

@@ -97,7 +97,7 @@ void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 
     juce::ignoreUnused (sampleRate, samplesPerBlock);
     carrier.prepare(spec);
-    midiOut.attachRing(&dspLookbackBuffer);
+    midiOut.attachRing(&dspRingBuffer);
     midiOut.setChannel(1);
     midiOut.setCcNumber(74);
     midiOut.setRateHz(400.0);

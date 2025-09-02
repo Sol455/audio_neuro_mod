@@ -3,18 +3,17 @@
 #ifndef AUDIO_NEURO_MOD_LSL_WORKER_H
 #define AUDIO_NEURO_MOD_LSL_WORKER_H
 
-#pragma once
 #include <juce_core/juce_core.h>
 #include <lsl_cpp.h>
 #include <atomic>
 #include <vector>
-#include "EegRingBuffer.h"
+#include "EegFIFO.h"
 #include "timestampMapper.h"
 
 class LslWorker : private juce::Thread
 {
 public:
-    explicit LslWorker (EegRingBuffer& dst, timestampMapper& mapper)
+    explicit LslWorker (EegFIFO& dst, timestampMapper& mapper)
         : juce::Thread ("LSL Worker"), ring (dst), stampMapper(mapper) {}
 
     void setInlet   (lsl::stream_inlet* p) { inlet.store (p, std::memory_order_release); }
@@ -57,18 +56,9 @@ private:
             if (ts != 0.0)  //sample got
             {
                 int64_t hostSampleIndex = stampMapper.toHostSample(ts);
-                auto w = ring.beginWrite (1);
-                if (w.n1 > 0) {
-                    w.p1[0].value = oneSample[(size_t) wantCh];
-                    w.p1[0].stamp = hostSampleIndex;
-                    ring.finishWrite (1);
-                }
-                else if (w.n2 > 0) {
-                    w.p2[0].value = oneSample[(size_t) wantCh];
-                    w.p2[0].stamp = hostSampleIndex;
-                    ring.finishWrite (1);
-                }
-                else {
+                EegSample sample{oneSample[(size_t) wantCh], hostSampleIndex};
+
+                if (!ring.addSample(sample)) {
                     // Ring full; drop one sample
                     juce::Thread::yield();
                 }
@@ -81,7 +71,7 @@ private:
         }
     }
 
-    EegRingBuffer&                  ring;
+    EegFIFO&                        ring;
     timestampMapper&                stampMapper;
     std::atomic<lsl::stream_inlet*> inlet   { nullptr }; // non-owning
     std::atomic<int>                channel { 0 };
