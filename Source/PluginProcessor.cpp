@@ -111,15 +111,13 @@ void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 
 void AudioPluginAudioProcessor::timerCallback()
 {
-    // Grab both timestamps at the same moment
+    //Grab both timestamps
     double lslTime = lsl::local_clock();
     int64_t currentSample = globalSampleCounter.load();
 
-    // Update the mapping
+    //Update the mapping
     stampMapper.calibrate(lslTime, currentSample);
 
-    // Optional: debug output
-    DBG("Calibrated: LSL=" << lslTime << " Sample=" << currentSample);
 }
 
 void AudioPluginAudioProcessor::disconnectLsl()
@@ -130,10 +128,17 @@ void AudioPluginAudioProcessor::disconnectLsl()
 }
 void AudioPluginAudioProcessor::lsl_stream()
 {
+    if (!lsl_connector.isConnected()) return;
+
+    double eegSampleRate = lsl_connector.getSampleRate();
+    int eegNumShannels = lsl_connector.getChannelCount();
+
+    DBG("LSL Steam. Channel Count=" << eegNumShannels << " Samplerate=" << eegSampleRate);
+
     lslWorker.setInlet (lsl_connector.inlet());
     lslWorker.setChannel(55);
     lslWorker.startWorker();
-    dspWorker.prepare(160.0f, 10.0f, 2.0f);
+    dspWorker.prepare(eegSampleRate, 10.0f, 2.0f);
     dspWorker.startWorker();
 }
 
