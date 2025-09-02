@@ -9,12 +9,13 @@
 #include <atomic>
 #include <vector>
 #include "EegRingBuffer.h"
+#include "timestampMapper.h"
 
 class LslWorker : private juce::Thread
 {
 public:
-    explicit LslWorker (EegRingBuffer& dst)
-        : juce::Thread ("LSL Worker"), ring (dst) {}
+    explicit LslWorker (EegRingBuffer& dst, timestampMapper& mapper)
+        : juce::Thread ("LSL Worker"), ring (dst), stampMapper(mapper) {}
 
     void setInlet   (lsl::stream_inlet* p) { inlet.store (p, std::memory_order_release); }
     void setChannel (const int idx)              { channel.store (idx, std::memory_order_relaxed); }
@@ -55,15 +56,16 @@ private:
 
             if (ts != 0.0)  //sample got
             {
+                int64_t hostSampleIndex = stampMapper.toHostSample(ts);
                 auto w = ring.beginWrite (1);
                 if (w.n1 > 0) {
                     w.p1[0].value = oneSample[(size_t) wantCh];
-                    w.p1[0].stamp = ts;
+                    w.p1[0].stamp = hostSampleIndex;
                     ring.finishWrite (1);
                 }
                 else if (w.n2 > 0) {
                     w.p2[0].value = oneSample[(size_t) wantCh];
-                    w.p2[0].stamp = ts;
+                    w.p2[0].stamp = hostSampleIndex;
                     ring.finishWrite (1);
                 }
                 else {
@@ -80,6 +82,7 @@ private:
     }
 
     EegRingBuffer&                  ring;
+    timestampMapper&                stampMapper;
     std::atomic<lsl::stream_inlet*> inlet   { nullptr }; // non-owning
     std::atomic<int>                channel { 0 };
 };

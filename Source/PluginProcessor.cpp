@@ -97,11 +97,28 @@ void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 
     juce::ignoreUnused (sampleRate, samplesPerBlock);
     carrier.prepare(spec);
-    midiOut.attachRing(&dspOutletRing);
+    midiOut.attachRing(&dspLookbackBuffer);
     midiOut.setChannel(1);
     midiOut.setCcNumber(74);
-    midiOut.setRateHz(160.0);
+    midiOut.setRateHz(400.0);
     midiOut.prepare(sampleRate);
+
+    stampMapper.prepare(sampleRate);
+
+    startTimer(500);
+}
+
+void AudioPluginAudioProcessor::timerCallback()
+{
+    // Grab both timestamps at the same moment
+    double lslTime = lsl::local_clock();
+    int64_t currentSample = globalSampleCounter.load();
+
+    // Update the mapping
+    stampMapper.calibrate(lslTime, currentSample);
+
+    // Optional: debug output
+    DBG("Calibrated: LSL=" << lslTime << " Sample=" << currentSample);
 }
 
 void AudioPluginAudioProcessor::releaseResources()
@@ -150,7 +167,7 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
 
     auto samplesThisBlock = buffer.getNumSamples();
     auto blockStartSample = globalSampleCounter.load();
-    DBG ("SAMPLECOUNT: " << blockStartSample);
+    //DBG ("SAMPLECOUNT: " << blockStartSample);
 
 
     // Your audio processing here...

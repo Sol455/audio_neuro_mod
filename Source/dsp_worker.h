@@ -11,11 +11,12 @@
 #include <vector>
 #include "lsl/eegRingBuffer.h"
 #include "filterMod.h"
+#include "lsl/lookBackBuffer.h"
 
 class DSPWorker : private juce::Thread
 {
 public:
-    explicit DSPWorker (EegRingBuffer& src, EegRingBuffer& dst, EegRingBuffer& ui)
+    explicit DSPWorker (EegRingBuffer& src, LookbackBuffer& dst, EegRingBuffer& ui)
         : juce::Thread ("DSP Worker"), source (src), dest (dst), uidest (ui){}
     void prepare(double eegFs, double centreHz = 10.0, double Q = 2.0);
 
@@ -34,7 +35,7 @@ private:
     double mod_min_depth = 0.15f;
 
     EegRingBuffer &source;
-    EegRingBuffer &dest;
+    LookbackBuffer &dest;
     EegRingBuffer &uidest;
     filterMod filtermod;
 };

@@ -21,13 +21,16 @@ void DSPWorker::process (const EegSample& sample_in)
 
     //const EegSample y { sample.value, sample.stamp };
 
-    //Write out samples to the DSP Outlet
-    auto writeDSP = dest.beginWrite(1);
-    if (writeDSP.n1 > 0) { writeDSP.p1[0] = out; dest.finishWrite(1); }
-    else if (writeDSP.n2 > 0) { writeDSP.p2[0] = out; dest.finishWrite(1); }
-    else {
-        // Dest Full, Drop one
-    }
+    // //Write out samples to the DSP Outlet
+    // auto writeDSP = dest.beginWrite(1);
+    // if (writeDSP.n1 > 0) { writeDSP.p1[0] = out; dest.finishWrite(1); }
+    // else if (writeDSP.n2 > 0) { writeDSP.p2[0] = out; dest.finishWrite(1); }
+    // else {
+    //     // Dest Full, Drop one
+    // }
+    //DBG ("DSP outmod:  " << out.value << " ts=" << out.stamp);
+    dest.addSample(out);
+
 
     //Write out samples to the UI OUTLET
     auto writeUI = uidest.beginWrite(1);

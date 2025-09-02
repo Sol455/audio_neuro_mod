@@ -8,12 +8,7 @@
 #pragma once
 #include <juce_core/juce_core.h>
 #include <vector>
-
-struct EegSample
-{
-    float  value;  // EEG sample
-    double stamp;  // LSL timestamp
-};
+#include "eegTypes.h"
 
 class EegRingBuffer
 {

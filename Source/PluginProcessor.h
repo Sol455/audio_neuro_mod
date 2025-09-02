@@ -6,12 +6,14 @@
 #include "lsl/lsl_connector.h"
 #include "lsl/lsl_worker.h"
 #include "lsl/eegRingBuffer.h"
+#include "lsl/lookBackBuffer.h"
+#include "lsl/timestampMapper.h"
 #include "dsp_worker.h"
 #include "MidiOutputLayer.h"
 
 
 //==============================================================================
-class AudioPluginAudioProcessor final : public juce::AudioProcessor
+class AudioPluginAudioProcessor final : public juce::AudioProcessor,  private juce::Timer
 {
 public:
     //==============================================================================
@@ -61,11 +63,21 @@ public:
 private:
     std::atomic<int64_t> globalSampleCounter{0};
     LslConnector lsl_connector;
+
+    //EEG Buffers
+    timestampMapper stampMapper;
     EegRingBuffer eegInletRing { 1 << 14 };
     EegRingBuffer dspOutletRing { 1 << 14 };
+    LookbackBuffer dspLookbackBuffer { 1 << 14 };
     EegRingBuffer uiOutletRing { 1 << 14 };
-    LslWorker lslWorker { eegInletRing };
-    DSPWorker dspWorker { eegInletRing , dspOutletRing, uiOutletRing};
+
+    //Worker Threads
+    LslWorker lslWorker { eegInletRing, stampMapper};
+    DSPWorker dspWorker { eegInletRing , dspLookbackBuffer, uiOutletRing};
+
+    //timestamp drift timer
+    void timerCallback() override;
+
     MidiOutputLayer midiOut;
     Carrier carrier;
     Params::Cache paramsCache;
