@@ -19,23 +19,30 @@ set(SourceFiles
         ${SRC_DIR}/PluginEditor.h
         ${SRC_DIR}/PluginProcessor.cpp
         ${SRC_DIR}/PluginProcessor.h
-        ${SRC_DIR}/Carrier.cpp
-        ${SRC_DIR}/Carrier.h
         ${SRC_DIR}/Params.h
+        ${SRC_DIR}/MidiOutputLayer.h
+        ${SRC_DIR}/MidiOutputLayer.cpp
+
+        #LSL
+        ${SRC_DIR}/lsl/eegTypes.h
         ${SRC_DIR}/lsl/lsl_connector.h
         ${SRC_DIR}/lsl/EegFIFO.h
         ${SRC_DIR}/lsl/lsl_worker.h
         ${SRC_DIR}/lsl/timestampMapper.h
         ${SRC_DIR}/lsl/timestampMapper.cpp
         ${SRC_DIR}/lsl/EegRingBuf.h
-        ${SRC_DIR}/dsp_worker.cpp
-        ${SRC_DIR}/dsp_worker.h
-        ${SRC_DIR}/filterMod.cpp
-        ${SRC_DIR}/filterMod.h
-        ${SRC_DIR}/EegScopeComponent.h
-        ${SRC_DIR}/MidiOutputLayer.h
-        ${SRC_DIR}/MidiOutputLayer.cpp
-        ${SRC_DIR}/lsl/eegTypes.h
+
+        #DSP
+        ${SRC_DIR}/dsp/Carrier.cpp
+        ${SRC_DIR}/dsp/Carrier.h
+        ${SRC_DIR}/dsp/dsp_worker.cpp
+        ${SRC_DIR}/dsp/dsp_worker.h
+        ${SRC_DIR}/dsp/filterMod.cpp
+        ${SRC_DIR}/dsp/filterMod.h
+
+        #UI
+        ${SRC_DIR}/ui/EegScopeComponent.h
+
 )
 
 # Change these to your own preferences

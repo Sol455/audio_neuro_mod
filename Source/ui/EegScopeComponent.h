@@ -8,7 +8,7 @@
 // EegScopeComponent.h
 #pragma once
 #include <juce_gui_basics/juce_gui_basics.h>
-#include "./lsl/EegFIFO.h"
+#include "../lsl/EegFIFO.h"
 
 class EegScopeComponent : public juce::Component,
                           private juce::Timer

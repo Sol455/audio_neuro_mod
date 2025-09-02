@@ -1,16 +1,15 @@
 #pragma once
 
 #include <juce_audio_processors/juce_audio_processors.h>
-#include "Carrier.h"
+#include "dsp/Carrier.h"
 #include "Params.h"
 #include "lsl/lsl_connector.h"
 #include "lsl/lsl_worker.h"
 #include "lsl/EegFIFO.h"
 #include "lsl/EegRingBuf.h"
 #include "lsl/timestampMapper.h"
-#include "dsp_worker.h"
+#include "dsp/dsp_worker.h"
 #include "MidiOutputLayer.h"
-
 
 //==============================================================================
 class AudioPluginAudioProcessor final : public juce::AudioProcessor,  private juce::Timer
@@ -55,9 +54,9 @@ public:
     juce::AudioProcessorValueTreeState apvts;
 
     bool connectLsl()   { return lsl_connector.connectFirstEEG(); }
-    void disconnectLsl(){ lsl_connector.disconnect(); }
     bool lslConnected() const { return lsl_connector.isConnected(); }
-    void lsl_stream() {lslWorker.setInlet (lsl_connector.inlet()); lslWorker.setChannel(55); lslWorker.startWorker(); dspWorker.prepare(160.0f, 10.0f, 2.0f); dspWorker.startWorker();}
+    void lsl_stream();
+    void disconnectLsl();
     EegFIFO& getUiRing() { return uiOutletFIFO; }
 
 private:

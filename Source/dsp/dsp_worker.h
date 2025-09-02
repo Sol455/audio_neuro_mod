@@ -8,9 +8,9 @@
 #include <juce_core/juce_core.h>
 #include <atomic>
 #include <vector>
-#include "lsl/EegFIFO.h"
+#include "../lsl/EegFIFO.h"
 #include "filterMod.h"
-#include "lsl/EegRingBuf.h"
+#include "../lsl/EegRingBuf.h"
 
 class DSPWorker : private juce::Thread
 {

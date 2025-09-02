@@ -19,6 +19,7 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
 
 AudioPluginAudioProcessor::~AudioPluginAudioProcessor()
 {
+    disconnectLsl();
 }
 
 //==============================================================================
@@ -119,6 +120,21 @@ void AudioPluginAudioProcessor::timerCallback()
 
     // Optional: debug output
     DBG("Calibrated: LSL=" << lslTime << " Sample=" << currentSample);
+}
+
+void AudioPluginAudioProcessor::disconnectLsl()
+{
+    lslWorker.stopWorker();
+    dspWorker.stopWorker();
+    lsl_connector.disconnect();
+}
+void AudioPluginAudioProcessor::lsl_stream()
+{
+    lslWorker.setInlet (lsl_connector.inlet());
+    lslWorker.setChannel(55);
+    lslWorker.startWorker();
+    dspWorker.prepare(160.0f, 10.0f, 2.0f);
+    dspWorker.startWorker();
 }
 
 void AudioPluginAudioProcessor::releaseResources()
