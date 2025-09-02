@@ -11,6 +11,7 @@ void DSPWorker::prepare(double eegFs, double centreHz, double Q) {
 void DSPWorker::process (const EegSample& sample_in)
 {
     //DSP Chain here:
+    percentile.addSample(sample_in.value);
 
     const float filtered_signal = filtermod.process(sample_in.value);
     const float mod_signal = madeModSignal(filtered_signal);
@@ -30,8 +31,9 @@ float DSPWorker::madeModSignal(float sample) {
     //DBG ("Sample in: " << sample);
 
     //1: normalise raw sample
+    float ref95 = percentile.getPercentile(0.95f); //7.688501426439704e-05
 
-    float depth = 0.5f * ((sample / 7.688501426439704e-05) + 1.0f);
+    float depth = 0.5f * ((sample / ref95) + 1.0f);
 
     //2: scale by modulation depth
     depth *= mod_depth;
