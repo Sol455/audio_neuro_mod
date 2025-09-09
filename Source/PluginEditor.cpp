@@ -46,11 +46,14 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     gainLabel.setJustificationType(juce::Justification::centred);
     addAndMakeVisible(gainLabel);
 
-    addAndMakeVisible (scope);
-    scope.setAutoscale (true);
+    //EEG Scopes
+    addAndMakeVisible (rawEegScope);
+    rawEegScope.setAutoscale (true);
+    rawEegScope.setSource (&processorRef.getUiRawRing(), 160.0); //@TO-DO remove hardcoded value
 
-    scope.setSource (&processorRef.getUiRing(), 160.0);
-
+    addAndMakeVisible (modulationScope);
+    modulationScope.setAutoscale (true);
+    modulationScope.setSource (&processorRef.getUiModRing(), 160.0); //@TO-DO remove hardcoded value
 
     //Channel Selector
     channelLabel.setText("EEG Channel:", juce::dontSendNotification);
@@ -159,7 +162,17 @@ void AudioPluginAudioProcessorEditor::resized()
     connectButton.setBounds(getWidth()/ 2 - 150, getHeight()/2 + 150 , 100, 50);
     streamButton.setBounds(getWidth()/ 2 - 50, getHeight()/2 + 150 , 100, 50);
 
-    scope.setBounds (getLocalBounds().withSizeKeepingCentre (700, 300));
+    rawEegScope.setBounds (getLocalBounds().withSizeKeepingCentre (700, 300));
+
+
+    auto scope_bounds = getLocalBounds().withSizeKeepingCentre(700, 300);
+
+    // Split the bounds vertically in half
+    rawEegScope.setBounds(scope_bounds.removeFromTop(scope_bounds.getHeight() / 2));
+    modulationScope.setBounds(scope_bounds);
+
+    //modulationScope.setBounds (getLocalBounds().withSizeKeepingCentre (700, 300));
+
 
     channelLabel.setBounds(10, 10, 100, 25);
     channelSelector.setBounds(120, 10, 150, 25);

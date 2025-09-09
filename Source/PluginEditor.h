@@ -14,15 +14,14 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
 
-
-
 private:
     void updateConnectButtonState();
     void updateChannelSelector();
     void timerCallback() override;
     void comboBoxChanged(juce::ComboBox* comboBox) override;
 
-    EegScopeComponent scope;
+    EegScopeComponent rawEegScope;
+    EegScopeComponent modulationScope;
     juce::Slider freqSlider, gainSlider;
     using SliderAttachment = juce::AudioProcessorValueTreeState::SliderAttachment;
     std::unique_ptr<SliderAttachment> freqSliderAttachment, gainSliderAttachment;

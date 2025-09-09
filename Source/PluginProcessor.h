@@ -61,8 +61,9 @@ public:
     void lsl_stream();
     void disconnectLsl();
 
-    //
-    EegFIFO& getUiRing() { return uiOutletFIFO; }
+    EegFIFO& getUiRawRing() { return uiRawOutletFIFO; }
+    EegFIFO& getUiModRing() { return uiModOutletFIFO; }
+
 
 private:
     std::atomic<int64_t> globalSampleCounter{0};
@@ -72,11 +73,14 @@ private:
     timestampMapper stampMapper;
     EegFIFO eegInletFIFO{ 1 << 14 };
     EegRingBuf dspRingBuffer { 1 << 14 };
-    EegFIFO uiOutletFIFO { 1 << 14 };
+
+    //UI FIFOs
+    EegFIFO uiRawOutletFIFO { 1 << 14 };
+    EegFIFO uiModOutletFIFO { 1 << 14 };
 
     //Worker Threads
     LslWorker lslWorker { eegInletFIFO, stampMapper};
-    DSPWorker dspWorker { eegInletFIFO , dspRingBuffer, uiOutletFIFO};
+    DSPWorker dspWorker { eegInletFIFO , dspRingBuffer, uiRawOutletFIFO, uiModOutletFIFO};
 
     //timestamp drift timer
     void timerCallback() override;

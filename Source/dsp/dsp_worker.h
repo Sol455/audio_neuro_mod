@@ -41,8 +41,8 @@ private:
 class DSPWorker : private juce::Thread
 {
 public:
-    explicit DSPWorker (EegFIFO& src, EegRingBuf& dst, EegFIFO& ui)
-        : juce::Thread ("DSP Worker"), sourceFIFO (src), destRING (dst), uiDestFIFO (ui){}
+    explicit DSPWorker (EegFIFO& src, EegRingBuf& dst, EegFIFO& ui, EegFIFO& uimod)
+        : juce::Thread ("DSP Worker"), sourceFIFO (src), destRING (dst), uiDestRawFIFO (ui), uiDestModFIFO (uimod){}
     void prepare(double eegFs, double centreHz = 10.0, double Q = 2.0);
 
     void startWorker() { if (! isThreadRunning()) startThread (Priority::high); }
@@ -63,7 +63,8 @@ private:
 
     EegFIFO &sourceFIFO;
     EegRingBuf &destRING;
-    EegFIFO &uiDestFIFO;
+    EegFIFO &uiDestRawFIFO;
+    EegFIFO &uiDestModFIFO;
     filterMod filtermod;
 };
 

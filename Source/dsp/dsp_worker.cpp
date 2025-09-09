@@ -20,8 +20,12 @@ void DSPWorker::process (const EegSample& sample_in)
     //Write to output ring Buffer
     destRING.addSample(out);
 
-    //Write out samples to the UI OUTLET
-    if (!uiDestFIFO.addSample(sample_in)) {
+    //Write out samples to the UI OUTLETs
+    if (!uiDestRawFIFO.addSample(sample_in)) {
+        // Dest Full, Drop one
+    }
+
+    if (!uiDestModFIFO.addSample(out)) {
         // Dest Full, Drop one
     }
 }
