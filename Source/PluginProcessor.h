@@ -55,8 +55,13 @@ public:
 
     bool connectLsl()   { return lsl_connector.connectFirstEEG(); }
     bool lslConnected() const { return lsl_connector.isConnected(); }
+    int getEegChannelCount() const { return lsl_connector.getChannelCount(); }
+    void setEegChannel(int channel) { lslWorker.setChannel(channel); }
+    int getCurrentEegChannel() const { return lslWorker.getChannel(); }
     void lsl_stream();
     void disconnectLsl();
+
+    //
     EegFIFO& getUiRing() { return uiOutletFIFO; }
 
 private:

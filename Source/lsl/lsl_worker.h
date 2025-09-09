@@ -17,7 +17,7 @@ public:
         : juce::Thread ("LSL Worker"), ring (dst), stampMapper(mapper) {}
 
     void setInlet   (lsl::stream_inlet* p) { inlet.store (p, std::memory_order_release); }
-    void setChannel (const int idx)              { channel.store (idx, std::memory_order_relaxed); }
+    void setChannel (const int idx)              { channel.store (idx, std::memory_order_relaxed); std::cout << "LslWorker: Channel changed to "<< idx << std::endl; }
     int  getChannel () const               { return channel.load (std::memory_order_relaxed); }
 
     void startWorker() { if (! isThreadRunning()) startThread (Priority::high); }

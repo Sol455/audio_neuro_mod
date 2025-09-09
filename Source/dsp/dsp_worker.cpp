@@ -21,7 +21,7 @@ void DSPWorker::process (const EegSample& sample_in)
     destRING.addSample(out);
 
     //Write out samples to the UI OUTLET
-    if (!uiDestFIFO.addSample(out)) {
+    if (!uiDestFIFO.addSample(sample_in)) {
         // Dest Full, Drop one
     }
 }

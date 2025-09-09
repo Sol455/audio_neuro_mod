@@ -29,7 +29,7 @@ void MidiOutputLayer::process (int numSamples, juce::MidiBuffer& midi, int64_t b
                         auto midiValue = scaleEegToMidi(eegValue);
                         auto midiMsg = juce::MidiMessage::controllerEvent(chan, cc, midiValue);
                         midi.addEvent(midiMsg, sampleInBlock);
-                        DBG ("Midi Value: " << midiValue << "eegValue" << eegValue);
+                        //DBG ("Midi Value: " << midiValue << "eegValue" << eegValue);
                     }
 
                     nextCcSample += samplesPerCc;

@@ -51,7 +51,77 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
 
     scope.setSource (&processorRef.getUiRing(), 160.0);
 
+
+    //Channel Selector
+    channelLabel.setText("EEG Channel:", juce::dontSendNotification);
+    addAndMakeVisible(channelLabel);
+
+    channelSelector.addListener(this);
+    channelSelector.setTextWhenNothingSelected("No channels available");
+    addAndMakeVisible(channelSelector);
+
+    // Update channel list if already connected
+    updateChannelSelector();
+
+    startTimer(1000);
     setSize (800, 500);
+}
+
+void AudioPluginAudioProcessorEditor::updateChannelSelector()
+{
+    channelSelector.clear();
+
+    if (processorRef.lslConnected())
+    {
+        int channelCount = processorRef.getEegChannelCount();
+
+        for (int i = 1; i <= channelCount; i++)
+        {
+            channelSelector.addItem("Channel " + juce::String(i), i);
+        }
+
+        if (channelCount > 0)
+        {
+            int currentChannel = processorRef.getCurrentEegChannel() + 1; // convert 0-based to 1-based
+            if (currentChannel >= 1 && currentChannel <= channelCount)
+                channelSelector.setSelectedId(currentChannel);
+            else
+                channelSelector.setSelectedId(1); // default to channel 1
+        }
+
+        channelSelector.setEnabled(true);
+    }
+    else
+    {
+        // No LSL connection
+        channelSelector.setTextWhenNothingSelected("LSL not connected");
+        channelSelector.setEnabled(false);
+    }
+}
+
+void AudioPluginAudioProcessorEditor::timerCallback()
+{
+    static bool wasConnected = false;
+    bool isConnected = processorRef.lslConnected();
+
+    if (isConnected != wasConnected)
+    {
+        updateChannelSelector();
+        wasConnected = isConnected;
+    }
+}
+
+void AudioPluginAudioProcessorEditor::comboBoxChanged(juce::ComboBox* comboBox)
+{
+    if (comboBox == &channelSelector)
+    {
+        int selectedChannel = channelSelector.getSelectedId() - 1; // convert to 0-based
+        if (selectedChannel >= 0)
+        {
+            processorRef.setEegChannel(selectedChannel);
+            std::cout << "Editor: User selected channel " << (selectedChannel + 1) << std::endl;
+        }
+    }
 }
 
 void AudioPluginAudioProcessorEditor::updateConnectButtonState()
@@ -90,6 +160,9 @@ void AudioPluginAudioProcessorEditor::resized()
     streamButton.setBounds(getWidth()/ 2 - 50, getHeight()/2 + 150 , 100, 50);
 
     scope.setBounds (getLocalBounds().withSizeKeepingCentre (700, 300));
+
+    channelLabel.setBounds(10, 10, 100, 25);
+    channelSelector.setBounds(120, 10, 150, 25);
 
 
     // This is generally where you'll want to lay out the positions of any
