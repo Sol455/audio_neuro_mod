@@ -13,44 +13,42 @@ void DSPWorker::process (const EegSample& sample_in)
     //DSP Chain here:
     percentile.addSample(sample_in.value);
 
-    const float filtered_signal = filtermod.process(sample_in.value);
-    const float mod_signal = madeModSignal(filtered_signal);
-    const EegSample out { mod_signal, sample_in.stamp };
+    //REAL processing
+    // const float filtered_signal = filtermod.filter(sample_in.value);
+    // const float mod_signal = filtermod.makeModSignalReal(filtered_signal, percentile);
+
+    //COMPLEX processing
+    std::complex<float> analytic = filtermod.filterComplex(sample_in.value);
+    float envelope = std::abs(analytic);
+    float phase = std::arg(analytic);
+
+    const float mod_signal = filtermod.makeModSignalComplex(envelope, phase, percentile);
+
+    //const float mod_signal = filtermod.makeModSignalReal(sample_in.value, percentile);
+
+
+    const EegSample mod_out { mod_signal, sample_in.stamp };
+
+    const EegSample phase_out { phase, sample_in.stamp };
+
 
     //Write to output ring Buffer
-    destRING.addSample(out);
+    destRING.addSample(mod_out);
 
     //Write out samples to the UI OUTLETs
     if (!uiDestRawFIFO.addSample(sample_in)) {
         // Dest Full, Drop one
     }
 
-    if (!uiDestModFIFO.addSample(out)) {
+    if (!uiDestPhaseFIFO.addSample(phase_out)) {
+        // Dest Full, Drop one
+    }
+
+    if (!uiDestModFIFO.addSample(mod_out)) {
         // Dest Full, Drop one
     }
 }
 
-float DSPWorker::madeModSignal(float sample) {
-
-    //DBG ("Sample in: " << sample);
-
-    //1: normalise raw sample
-    float ref95 = percentile.getPercentile(0.95f); //7.688501426439704e-05
-
-    float depth = 0.5f * ((sample / ref95) + 1.0f);
-
-    //2: scale by modulation depth
-    depth *= mod_depth;
-
-    //3: clip into [0,1]
-    depth = juce::jlimit(0.0f, 1.0f, depth);
-
-    //4: apply min/max modulation depth window
-    float modulator_signal = mod_min_depth + (1.0 - mod_min_depth) * depth;
-
-    return modulator_signal;
-
-}
 
 void DSPWorker::run()
 {

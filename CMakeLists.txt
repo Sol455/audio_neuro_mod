@@ -39,6 +39,9 @@ set(SourceFiles
         ${SRC_DIR}/dsp/dsp_worker.h
         ${SRC_DIR}/dsp/filterMod.cpp
         ${SRC_DIR}/dsp/filterMod.h
+        ${SRC_DIR}/dsp/CFIRFilter.h
+        ${SRC_DIR}/dsp/CFIRFilter.cpp
+        ${SRC_DIR}/dsp/RunningPercentile.h
 
         #UI
         ${SRC_DIR}/ui/EegScopeComponent.h

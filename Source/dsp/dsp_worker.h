@@ -11,38 +11,15 @@
 #include "../lsl/EegFIFO.h"
 #include "filterMod.h"
 #include "../lsl/EegRingBuf.h"
-
-class RunningPercentile {
-public:
-    void addSample(float value) {
-        samples.push_back(std::abs(value));
-        if (samples.size() > MAX_SAMPLES) {
-            samples.pop_front();
-        }
-    }
-
-    float getPercentile(float p = 0.95f) {
-        if (samples.empty()) return 1.0f;
-
-        auto sorted = samples;
-        std::sort(sorted.begin(), sorted.end());
-        size_t idx = static_cast<size_t>(p * (sorted.size() - 1));
-        return sorted[idx];
-    }
-
-    void clear() { samples.clear(); }
-
-private:
-    std::deque<float> samples;
-    static constexpr size_t MAX_SAMPLES = 16000;
-
-};
+#include "RunningPercentile.h"
 
 class DSPWorker : private juce::Thread
 {
 public:
-    explicit DSPWorker (EegFIFO& src, EegRingBuf& dst, EegFIFO& ui, EegFIFO& uimod)
-        : juce::Thread ("DSP Worker"), sourceFIFO (src), destRING (dst), uiDestRawFIFO (ui), uiDestModFIFO (uimod){}
+    explicit DSPWorker (EegFIFO& src, EegRingBuf& dst, EegFIFO& ui, EegFIFO& uimod, EegFIFO& uiphase
+        )
+        : juce::Thread ("DSP Worker"), sourceFIFO (src), destRING (dst), uiDestRawFIFO (ui), uiDestModFIFO (uimod), uiDestPhaseFIFO(uiphase){}
+
     void prepare(double eegFs, double centreHz = 10.0, double Q = 2.0);
 
     void startWorker() { if (! isThreadRunning()) startThread (Priority::high); }
@@ -53,17 +30,12 @@ private:
 
     void run() override;
 
-    float madeModSignal(float env_sample);
-
-    double envelope_95_ref = 7.688501426439704;
-    double mod_depth = 0.8f;
-    double mod_min_depth = 0.15f;
-
     RunningPercentile percentile;
 
     EegFIFO &sourceFIFO;
     EegRingBuf &destRING;
     EegFIFO &uiDestRawFIFO;
+    EegFIFO &uiDestPhaseFIFO;
     EegFIFO &uiDestModFIFO;
     filterMod filtermod;
 };

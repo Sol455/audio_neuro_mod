@@ -50,10 +50,17 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     addAndMakeVisible (rawEegScope);
     rawEegScope.setAutoscale (true);
     rawEegScope.setSource (&processorRef.getUiRawRing(), 160.0); //@TO-DO remove hardcoded value
+    rawEegScope.setTraceColour(juce::Colours::limegreen);
+
+    addAndMakeVisible (phaseScope);
+    phaseScope.setAutoscale (true);
+    phaseScope.setSource (&processorRef.getUiPhaseRing(), 160.0); //@TO-DO remove hardcoded value
+    phaseScope.setTraceColour(juce::Colours::firebrick);
 
     addAndMakeVisible (modulationScope);
     modulationScope.setAutoscale (true);
     modulationScope.setSource (&processorRef.getUiModRing(), 160.0); //@TO-DO remove hardcoded value
+    modulationScope.setTraceColour(juce::Colours::coral);
 
     //Channel Selector
     channelLabel.setText("EEG Channel:", juce::dontSendNotification);
@@ -166,13 +173,13 @@ void AudioPluginAudioProcessorEditor::resized()
 
 
     auto scope_bounds = getLocalBounds().withSizeKeepingCentre(700, 300);
+    int thirdHeight = scope_bounds.getHeight() / 3;
 
-    // Split the bounds vertically in half
-    rawEegScope.setBounds(scope_bounds.removeFromTop(scope_bounds.getHeight() / 2));
+    rawEegScope.setBounds(scope_bounds.removeFromTop(thirdHeight));
+    phaseScope.setBounds(scope_bounds.removeFromTop(thirdHeight));
     modulationScope.setBounds(scope_bounds);
 
     //modulationScope.setBounds (getLocalBounds().withSizeKeepingCentre (700, 300));
-
 
     channelLabel.setBounds(10, 10, 100, 25);
     channelSelector.setBounds(120, 10, 150, 25);

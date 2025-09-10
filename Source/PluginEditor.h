@@ -21,7 +21,9 @@ private:
     void comboBoxChanged(juce::ComboBox* comboBox) override;
 
     EegScopeComponent rawEegScope;
+    EegScopeComponent phaseScope;
     EegScopeComponent modulationScope;
+
     juce::Slider freqSlider, gainSlider;
     using SliderAttachment = juce::AudioProcessorValueTreeState::SliderAttachment;
     std::unique_ptr<SliderAttachment> freqSliderAttachment, gainSliderAttachment;

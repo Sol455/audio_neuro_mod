@@ -25,6 +25,8 @@ public:
     void setAutoscale (bool enabled) { autoscale = enabled; }
     void setTraceThickness (float px) { thickness = juce::jlimit (0.5f, 4.0f, px); }
 
+    void setTraceColour (const juce::Colour& newColour) { traceColour = newColour; }
+
     void paint (juce::Graphics& g) override
     {
         g.fillAll (juce::Colours::black);
@@ -56,7 +58,7 @@ public:
             else        p.lineTo         (x, y);
         }
 
-        g.setColour (juce::Colours::lime);
+        g.setColour (traceColour);
         g.strokePath (p, juce::PathStrokeType (thickness));
     }
 
@@ -93,6 +95,8 @@ private:
 
     std::vector<float> temp;
     std::vector<float> plot;
+
+    juce::Colour traceColour = juce::Colours::lime;
 };
 
 #endif //AUDIO_NEURO_MOD_EEGSCOPECOMPONENT_H
