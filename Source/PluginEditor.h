@@ -24,12 +24,14 @@ private:
     EegScopeComponent phaseScope;
     EegScopeComponent modulationScope;
 
-    juce::Slider freqSlider, gainSlider;
+    juce::Slider freqSlider, gainSlider, phaseSlider;
     using SliderAttachment = juce::AudioProcessorValueTreeState::SliderAttachment;
-    std::unique_ptr<SliderAttachment> freqSliderAttachment, gainSliderAttachment;
+    std::unique_ptr<SliderAttachment> freqSliderAttachment, gainSliderAttachment, phaseSliderAttachment;
 
     juce::Label freqLabel {"freqLabel", "Frequency"};
     juce::Label gainLabel {"gainLabel", "Gain"};
+    juce::Label phaseLabel {"phaseLabel", "Phase Offset"};
+
     juce::TextButton connectButton, streamButton;
 
     juce::ComboBox channelSelector;

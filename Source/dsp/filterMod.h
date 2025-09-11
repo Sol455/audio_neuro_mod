@@ -23,7 +23,7 @@ public:
 
     float makeModSignalReal(float sample, RunningPercentile& percentile);
 
-    float makeModSignalComplex(float env, float phase, RunningPercentile& percentile);
+    float makeModSignalComplex(float env, float phase, float phase_offset, RunningPercentile& percentile);
 
 
 private:

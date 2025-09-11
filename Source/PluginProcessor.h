@@ -80,18 +80,21 @@ private:
     EegFIFO uiPhaseOutletFIFO { 1024 };
     EegFIFO uiModOutletFIFO { 1024};
 
+    //Output and sync layers
+    OutputSyncLayer outputSync;
+    MidiOutputLayer midiOut;
+
+    Carrier carrier;
+    Params::Cache paramsCache;
+
     //Worker Threads
     LslWorker lslWorker { eegInletFIFO, stampMapper};
-    DSPWorker dspWorker { eegInletFIFO , dspRingBuffer, uiRawOutletFIFO, uiModOutletFIFO, uiPhaseOutletFIFO};
+    DSPWorker dspWorker { eegInletFIFO , dspRingBuffer, uiRawOutletFIFO, uiModOutletFIFO, uiPhaseOutletFIFO, paramsCache};
 
     //timestamp drift timer
     void timerCallback() override;
 
-    OutputSyncLayer outputSync;
 
-    MidiOutputLayer midiOut;
-    Carrier carrier;
-    Params::Cache paramsCache;
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessor)

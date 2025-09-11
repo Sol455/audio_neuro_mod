@@ -8,17 +8,30 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     juce::ignoreUnused (processorRef);
     addAndMakeVisible(freqSlider);
     addAndMakeVisible(gainSlider);
+    addAndMakeVisible(phaseSlider);
 
     freqSlider.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
     gainSlider.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
+    phaseSlider.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
 
     freqSlider.setTextBoxStyle(juce::Slider::TextBoxLeft, true, 50, 13);
     gainSlider.setTextBoxStyle(juce::Slider::TextBoxLeft, true, 50, 13);
+    phaseSlider.setTextBoxStyle(juce::Slider::TextBoxLeft, true, 50, 13);
+
 
     gainSliderAttachment  = std::make_unique<SliderAttachment>(processorRef.apvts, Params::IDs::Gain.getParamID()
 , gainSlider);
     freqSliderAttachment  = std::make_unique<SliderAttachment>(processorRef.apvts, Params::IDs::Freq.getParamID()
 , freqSlider);
+    phaseSliderAttachment  = std::make_unique<SliderAttachment>(processorRef.apvts, Params::IDs::PhaseOffset.getParamID()
+, phaseSlider);
+
+    freqLabel.setJustificationType(juce::Justification::centred);
+    addAndMakeVisible(freqLabel);
+    gainLabel.setJustificationType(juce::Justification::centred);
+    addAndMakeVisible(gainLabel);
+    phaseLabel.setJustificationType(juce::Justification::centred);
+    addAndMakeVisible(phaseLabel);
 
     addAndMakeVisible(connectButton);
     connectButton.setButtonText("Connect");
@@ -39,12 +52,7 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
         processorRef.lsl_stream();
     };
 
-    //freqLabel.setColour(juce::Label::ColourIds::outlineColourId, juce::Colours::white);
-    freqLabel.setJustificationType(juce::Justification::centred);
-    addAndMakeVisible(freqLabel);
-    //gainLabel.setColour(juce::Label::ColourIds::outlineColourId, juce::Colours::white);
-    gainLabel.setJustificationType(juce::Justification::centred);
-    addAndMakeVisible(gainLabel);
+
 
     //EEG Scopes
     addAndMakeVisible (rawEegScope);
@@ -183,5 +191,8 @@ void AudioPluginAudioProcessorEditor::resized()
 
     gainLabel.setBounds(getWidth() - 180, scopeBottom + 70, 160, 20);
     gainSlider.setBounds(getWidth() - 180, scopeBottom + 50, 160, 25);
+
+    phaseLabel.setBounds(getWidth() - 180, scopeBottom - 370, 160, 20);
+    phaseSlider.setBounds(getWidth() - 180, scopeBottom - 350, 160, 25);
 }
 

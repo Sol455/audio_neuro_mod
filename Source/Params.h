@@ -13,6 +13,8 @@ namespace Params
 
         inline const juce::ParameterID Freq { "FREQ", 1 };
         inline const juce::ParameterID Gain { "GAIN", 1 };
+        inline const juce::ParameterID PhaseOffset { "PHASE_OFFSET", 1 };  // Add this
+
 
     }
 
@@ -45,17 +47,22 @@ namespace Params
     {
         std::atomic<float>* freq = nullptr;
         std::atomic<float>* gain = nullptr;
+        std::atomic<float>* phaseOffset = nullptr;
 
         juce::AudioParameterFloat* freqParam = nullptr;
         juce::AudioParameterFloat* gainParam = nullptr;
+        juce::AudioParameterFloat* phaseOffsetParam = nullptr;
 
         void init (juce::AudioProcessorValueTreeState& apvts)
         {
             freq = raw (apvts, IDs::Freq);
             gain = raw (apvts, IDs::Gain);
+            phaseOffset = raw (apvts, IDs::PhaseOffset);
 
             freqParam = as<juce::AudioParameterFloat> (param (apvts, IDs::Freq));
             gainParam = as<juce::AudioParameterFloat> (param (apvts, IDs::Gain));
+            phaseOffsetParam = as<juce::AudioParameterFloat> (param (apvts, IDs::PhaseOffset));
+
         }
     };
 }

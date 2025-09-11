@@ -199,7 +199,7 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-    //midiOut.process(buffer.getNumSamples(),midiMessages, blockStartSample);
+    midiOut.process(buffer.getNumSamples(),midiMessages, blockStartSample);
 
     //float eegValue = outputSync.getEegValueAtTime(blockStartSample);
     //DBG("EEG VALUE: " << eegValue );
@@ -269,5 +269,12 @@ juce::AudioProcessorValueTreeState::ParameterLayout AudioPluginAudioProcessor::c
 
     params.push_back(std::make_unique<juce::AudioParameterFloat>(Params::IDs::Gain, "Gain",
     juce::NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.5f));
+
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(Params::IDs::PhaseOffset, "Phase Offset",
+    juce::NormalisableRange<float>(-180.0f, 180.0f, 1.0f),
+        0.0f,
+        "°"));
+
     return { params.begin(), params.end() };
+
 }

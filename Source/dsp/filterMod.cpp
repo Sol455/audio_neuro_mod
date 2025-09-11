@@ -49,10 +49,9 @@ std::complex<float> filterMod::filterComplex (float input) {
     return analyticSignal;;
 }
 
-float filterMod::makeModSignalComplex(float env, float phase, RunningPercentile& percentile)
+float filterMod::makeModSignalComplex(float env, float phase, float phase_offset, RunningPercentile& percentile)
 {
     float envelope_95_percentile = percentile.getPercentile(0.95f);
-    float phase_offset = 0.0f;
 
     //depth
     float depth = (env / envelope_95_percentile) * mod_depth;

@@ -62,6 +62,7 @@ public:
             double t = static_cast<double>(targetSampleIndex - before->stamp) /
                       static_cast<double>(after->stamp - before->stamp);
             outValue = before->value + static_cast<float>(t * (after->value - before->value));
+            //DBG("RB: before and after: INTERPOLATE!");
             return true;
         }
         else if (before) {
@@ -73,10 +74,10 @@ public:
         else if (after) {
             // Only have data after target - use earliest
             outValue = after->value;
-            DBG("RB: only data after target!");
+            //DBG("RB: only data after target!");
             return true;
         }
-        DBG("RB: No Valid Data found ;(");
+        //DBG("RB: No Valid Data found ;(");
         return false; // No valid data found
     }
 

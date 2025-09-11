@@ -22,7 +22,10 @@ void DSPWorker::process (const EegSample& sample_in)
     float envelope = std::abs(analytic);
     float phase = std::arg(analytic);
 
-    const float mod_signal = filtermod.makeModSignalComplex(envelope, phase, percentile);
+    float phaseOffsetDegrees = paramsCache.phaseOffset->load();
+    float phaseOffsetRadians = phaseOffsetDegrees * (M_PI / 180.0f);
+
+    const float mod_signal = filtermod.makeModSignalComplex(envelope, phase, phaseOffsetRadians, percentile);
 
     //const float mod_signal = filtermod.makeModSignalReal(sample_in.value, percentile);
 

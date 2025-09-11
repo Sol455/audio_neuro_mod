@@ -12,14 +12,14 @@
 #include "filterMod.h"
 #include "../lsl/EegRingBuf.h"
 #include "RunningPercentile.h"
+#include "../Params.h"
 
 class DSPWorker : private juce::Thread
 {
 public:
-    explicit DSPWorker (EegFIFO& src, EegRingBuf& dst, EegFIFO& ui, EegFIFO& uimod, EegFIFO& uiphase
+    explicit DSPWorker (EegFIFO& src, EegRingBuf& dst, EegFIFO& ui, EegFIFO& uimod, EegFIFO& uiphase, Params::Cache& pCache
         )
-        : juce::Thread ("DSP Worker"), sourceFIFO (src), destRING (dst), uiDestRawFIFO (ui), uiDestModFIFO (uimod), uiDestPhaseFIFO(uiphase){}
-
+        : juce::Thread ("DSP Worker"), sourceFIFO (src), destRING (dst), uiDestRawFIFO (ui), uiDestModFIFO (uimod), uiDestPhaseFIFO(uiphase), paramsCache(pCache){}
     void prepare(double eegFs, double centreHz = 10.0, double Q = 2.0);
 
     void startWorker() { if (! isThreadRunning()) startThread (Priority::high); }
@@ -33,6 +33,8 @@ private:
     RunningPercentile percentile;
 
     EegFIFO &sourceFIFO;
+
+    Params::Cache &paramsCache;
     EegRingBuf &destRING;
     EegFIFO &uiDestRawFIFO;
     EegFIFO &uiDestPhaseFIFO;
