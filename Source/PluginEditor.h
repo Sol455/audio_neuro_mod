@@ -32,8 +32,16 @@ private:
     juce::Label gainLabel {"gainLabel", "Gain"};
     juce::Label phaseLabel {"phaseLabel", "Phase Offset"};
 
-    juce::TextButton connectButton, streamButton;
+    juce::Label systemDelayLabel, desiredPhaseLabel, brainFreqLabel;
+    juce::TextEditor systemDelayInput;
+    juce::TextEditor desiredPhaseInput;
+    juce::TextEditor brainFreqInput;
+    juce::TextButton calculateButton;
 
+    void calculatePhaseOffset();
+
+
+    juce::TextButton connectButton, streamButton;
     juce::ComboBox channelSelector;
     juce::Label channelLabel;
 

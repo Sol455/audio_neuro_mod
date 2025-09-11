@@ -52,6 +52,38 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
         processorRef.lsl_stream();
     };
 
+    //==============Phase compensation=======================
+
+    systemDelayLabel.setText("System Delay (ms):", juce::dontSendNotification);
+    addAndMakeVisible(systemDelayLabel);
+
+    systemDelayInput.setMultiLine(false);
+    systemDelayInput.setText("50.0");
+    systemDelayInput.setInputRestrictions(10, "0123456789.");
+    addAndMakeVisible(systemDelayInput);
+
+    // Desired phase input
+    desiredPhaseLabel.setText("Desired Phase (°):", juce::dontSendNotification);
+    addAndMakeVisible(desiredPhaseLabel);
+
+    desiredPhaseInput.setMultiLine(false);
+    desiredPhaseInput.setText("0");
+    desiredPhaseInput.setInputRestrictions(10, "0123456789.-");
+    addAndMakeVisible(desiredPhaseInput);
+
+    // Brain frequency input
+    brainFreqLabel.setText("Brain Freq (Hz):", juce::dontSendNotification);
+    addAndMakeVisible(brainFreqLabel);
+
+    brainFreqInput.setMultiLine(false);
+    brainFreqInput.setText("10.0");
+    brainFreqInput.setInputRestrictions(10, "0123456789.");
+    addAndMakeVisible(brainFreqInput);
+
+    // Calculate button
+    calculateButton.setButtonText("Calculate & Set");
+    calculateButton.onClick = [this]() { calculatePhaseOffset(); };
+    addAndMakeVisible(calculateButton);
 
 
     //EEG Scopes
@@ -83,6 +115,27 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
 
     startTimer(1000);
     setSize (800, 500);
+}
+
+void AudioPluginAudioProcessorEditor::calculatePhaseOffset()
+{
+    float systemDelayMs = systemDelayInput.getText().getFloatValue();
+    float desiredPhaseDeg = desiredPhaseInput.getText().getFloatValue();
+    float brainFreqHz = brainFreqInput.getText().getFloatValue();
+
+    if (brainFreqHz <= 0.0f) { //No division by 0
+        brainFreqHz = 10.0f;
+        brainFreqInput.setText("10.0");
+    }
+
+    float delayPhaseShift = (systemDelayMs / 1000.0f) * brainFreqHz * 360.0f;
+
+    float compensationPhase = desiredPhaseDeg - delayPhaseShift;
+
+    while (compensationPhase > 180.0f) compensationPhase -= 360.0f;
+    while (compensationPhase < -180.0f) compensationPhase += 360.0f;
+
+    phaseSlider.setValue(compensationPhase);
 }
 
 void AudioPluginAudioProcessorEditor::updateChannelSelector()
@@ -183,7 +236,6 @@ void AudioPluginAudioProcessorEditor::resized()
     channelLabel.setBounds(10, 10, 100, 25);
     channelSelector.setBounds(120, 10, 150, 25);
 
-    // Position sliders relative to actual scope bounds
     int scopeBottom = scope_bounds.getBottom(); // Use actual scope bounds
 
     freqLabel.setBounds(getWidth() - 180, scopeBottom + 10, 160, 20);
@@ -194,5 +246,19 @@ void AudioPluginAudioProcessorEditor::resized()
 
     phaseLabel.setBounds(getWidth() - 180, scopeBottom - 370, 160, 20);
     phaseSlider.setBounds(getWidth() - 180, scopeBottom - 350, 160, 25);
+
+    int helperStartX = getWidth() - 180 - 150;
+    int helperStartY = scopeBottom - 400;
+
+    systemDelayLabel.setBounds(helperStartX, helperStartY, 80, 20);
+    systemDelayInput.setBounds(helperStartX + 85, helperStartY, 60, 20);
+
+    desiredPhaseLabel.setBounds(helperStartX, helperStartY + 25, 80, 20);
+    desiredPhaseInput.setBounds(helperStartX + 85, helperStartY + 25, 60, 20);
+
+    brainFreqLabel.setBounds(helperStartX, helperStartY + 50, 80, 20);
+    brainFreqInput.setBounds(helperStartX + 85, helperStartY + 50, 60, 20);
+
+    calculateButton.setBounds(helperStartX, helperStartY + 80, 100, 25);
 }
 
