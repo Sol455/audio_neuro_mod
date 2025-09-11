@@ -22,6 +22,8 @@ set(SourceFiles
         ${SRC_DIR}/Params.h
         ${SRC_DIR}/MidiOutputLayer.h
         ${SRC_DIR}/MidiOutputLayer.cpp
+        ${SRC_DIR}/OutputSyncLayer.h
+        ${SRC_DIR}/OutputSyncLayer.cpp
 
         #LSL
         ${SRC_DIR}/lsl/eegTypes.h

@@ -97,14 +97,21 @@ void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
     };
 
     juce::ignoreUnused (sampleRate, samplesPerBlock);
+    outputSync.prepare(sampleRate);
+    outputSync.setDelayMs(20.0f);
+    outputSync.attachRing(&dspRingBuffer);
+
     carrier.prepare(spec);
-    midiOut.attachRing(&dspRingBuffer);
+    midiOut.attachSyncLayer(&outputSync);
     midiOut.setChannel(1);
     midiOut.setCcNumber(74);
     midiOut.setRateHz(400.0);
     midiOut.prepare(sampleRate);
 
     stampMapper.prepare(sampleRate);
+
+    //output sync layer (jitter control)
+
 
     startTimer(500);
 }
@@ -140,6 +147,7 @@ void AudioPluginAudioProcessor::lsl_stream()
     lslWorker.startWorker();
     dspWorker.prepare(eegSampleRate, 10.0f, 2.0f);
     dspWorker.startWorker();
+
 }
 
 void AudioPluginAudioProcessor::releaseResources()
@@ -185,34 +193,35 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     const float freq = paramsCache.freq->load();
     const float gain = paramsCache.gain->load();
 
-
     auto samplesThisBlock = buffer.getNumSamples();
     auto blockStartSample = globalSampleCounter.load();
-    //DBG ("SAMPLECOUNT: " << blockStartSample);
-
-
-    // Your audio processing here...
-
-    // Process MIDI output with sample-accurate timing
-    //midiOutput.process(samplesThisBlock, midi, blockStartSample);
-
-    // Update global counter once per block
-
-    midiOut.process(buffer.getNumSamples(),midiMessages, blockStartSample);
-
 
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    {
-        auto* channelData = buffer.getWritePointer (channel);
-        juce::ignoreUnused (channelData);
-        carrier.setFrequency(freq);
-        carrier.setAmplitude(gain);
-        carrier.process(buffer);
+    //midiOut.process(buffer.getNumSamples(),midiMessages, blockStartSample);
 
+    //float eegValue = outputSync.getEegValueAtTime(blockStartSample);
+    //DBG("EEG VALUE: " << eegValue );
+
+    carrier.setFrequency(freq);
+    carrier.setAmplitude(gain);
+    carrier.process(buffer);
+
+    for (int channel = 0; channel < buffer.getNumChannels(); ++channel) {
+        auto* channelData = buffer.getWritePointer(channel);
+
+        for (int sample = 0; sample < buffer.getNumSamples(); ++sample) {
+            auto currentSample = blockStartSample + sample;
+
+            float eegValue = outputSync.getEegValueAtTime(currentSample);
+
+            eegValue = juce::jlimit(0.1f, 2.0f, eegValue);
+
+            channelData[sample] *= eegValue;
+        }
     }
+
     globalSampleCounter.store(blockStartSample + samplesThisBlock);
 }
 
@@ -259,6 +268,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout AudioPluginAudioProcessor::c
     juce::NormalisableRange<float>(0.f, 10000.f, 10.0), 400.0f));
 
     params.push_back(std::make_unique<juce::AudioParameterFloat>(Params::IDs::Gain, "Gain",
-    juce::NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.0f));
+    juce::NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.5f));
     return { params.begin(), params.end() };
 }

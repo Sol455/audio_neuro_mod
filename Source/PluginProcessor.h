@@ -10,6 +10,7 @@
 #include "lsl/timestampMapper.h"
 #include "dsp/dsp_worker.h"
 #include "MidiOutputLayer.h"
+#include "OutputSyncLayer.h"
 
 //==============================================================================
 class AudioPluginAudioProcessor final : public juce::AudioProcessor,  private juce::Timer
@@ -71,13 +72,13 @@ private:
 
     //EEG Buffers
     timestampMapper stampMapper;
-    EegFIFO eegInletFIFO{ 1 << 14 };
-    EegRingBuf dspRingBuffer { 1 << 14 };
+    EegFIFO eegInletFIFO{ 1024};
+    EegRingBuf dspRingBuffer { 512 };
 
     //UI FIFOs
-    EegFIFO uiRawOutletFIFO { 1 << 14 };
-    EegFIFO uiPhaseOutletFIFO { 1 << 14 };
-    EegFIFO uiModOutletFIFO { 1 << 14 };
+    EegFIFO uiRawOutletFIFO { 1024};
+    EegFIFO uiPhaseOutletFIFO { 1024 };
+    EegFIFO uiModOutletFIFO { 1024};
 
     //Worker Threads
     LslWorker lslWorker { eegInletFIFO, stampMapper};
@@ -85,6 +86,8 @@ private:
 
     //timestamp drift timer
     void timerCallback() override;
+
+    OutputSyncLayer outputSync;
 
     MidiOutputLayer midiOut;
     Carrier carrier;

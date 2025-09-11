@@ -77,7 +77,6 @@ float filterMod::makeModSignalComplex(float env, float phase, RunningPercentile&
 }
 
 
-
 void filterMod::setBand(double centreHz, double Q) {
     jassert (fs_ > 0.0);
     auto coeff = juce::dsp::IIR::Coefficients<float>::makeBandPass (fs_, centreHz, Q);

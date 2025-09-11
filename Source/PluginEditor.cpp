@@ -6,14 +6,14 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     : AudioProcessorEditor (&p), processorRef (p)
 {
     juce::ignoreUnused (processorRef);
-    // addAndMakeVisible(freqSlider);
-    // addAndMakeVisible(gainSlider);
+    addAndMakeVisible(freqSlider);
+    addAndMakeVisible(gainSlider);
 
-    freqSlider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
-    gainSlider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
+    freqSlider.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
+    gainSlider.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
 
-    freqSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 100, 50);
-    gainSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 100, 50);
+    freqSlider.setTextBoxStyle(juce::Slider::TextBoxLeft, true, 50, 13);
+    gainSlider.setTextBoxStyle(juce::Slider::TextBoxLeft, true, 50, 13);
 
     gainSliderAttachment  = std::make_unique<SliderAttachment>(processorRef.apvts, Params::IDs::Gain.getParamID()
 , gainSlider);
@@ -39,10 +39,10 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
         processorRef.lsl_stream();
     };
 
-    freqLabel.setColour(juce::Label::ColourIds::outlineColourId, juce::Colours::white);
+    //freqLabel.setColour(juce::Label::ColourIds::outlineColourId, juce::Colours::white);
     freqLabel.setJustificationType(juce::Justification::centred);
     addAndMakeVisible(freqLabel);
-    gainLabel.setColour(juce::Label::ColourIds::outlineColourId, juce::Colours::white);
+    //gainLabel.setColour(juce::Label::ColourIds::outlineColourId, juce::Colours::white);
     gainLabel.setJustificationType(juce::Justification::centred);
     addAndMakeVisible(gainLabel);
 
@@ -162,15 +162,8 @@ void AudioPluginAudioProcessorEditor::paint (juce::Graphics& g)
 
 void AudioPluginAudioProcessorEditor::resized()
 {
-    freqLabel.setBounds(getWidth()/ 2 - 50, getHeight()/2 - 120 , 100, 20);
-    freqSlider.setBounds(getWidth()/ 2 - 50, getHeight()/2 - 100 , 100, 200);
-    gainSlider.setBounds(getWidth()/ 2 - 150, getHeight()/2 - 100 , 100, 200);
-    gainLabel.setBounds(getWidth()/ 2 - 150, getHeight()/2 - 120 , 100, 20);
     connectButton.setBounds(getWidth()/ 2 - 150, getHeight()/2 + 150 , 100, 50);
     streamButton.setBounds(getWidth()/ 2 - 50, getHeight()/2 + 150 , 100, 50);
-
-    rawEegScope.setBounds (getLocalBounds().withSizeKeepingCentre (700, 300));
-
 
     auto scope_bounds = getLocalBounds().withSizeKeepingCentre(700, 300);
     int thirdHeight = scope_bounds.getHeight() / 3;
@@ -179,13 +172,16 @@ void AudioPluginAudioProcessorEditor::resized()
     phaseScope.setBounds(scope_bounds.removeFromTop(thirdHeight));
     modulationScope.setBounds(scope_bounds);
 
-    //modulationScope.setBounds (getLocalBounds().withSizeKeepingCentre (700, 300));
-
     channelLabel.setBounds(10, 10, 100, 25);
     channelSelector.setBounds(120, 10, 150, 25);
 
+    // Position sliders relative to actual scope bounds
+    int scopeBottom = scope_bounds.getBottom(); // Use actual scope bounds
 
-    // This is generally where you'll want to lay out the positions of any
-    // subcomponents in your editor..
+    freqLabel.setBounds(getWidth() - 180, scopeBottom + 10, 160, 20);
+    freqSlider.setBounds(getWidth() - 180, scopeBottom + 35, 160, 25);
+
+    gainLabel.setBounds(getWidth() - 180, scopeBottom + 70, 160, 20);
+    gainSlider.setBounds(getWidth() - 180, scopeBottom + 50, 160, 25);
 }
 

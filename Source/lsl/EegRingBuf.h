@@ -20,7 +20,12 @@ public:
         : buffer(capacitySamples), capacity(capacitySamples) {}
 
     void addSample(const EegSample& sample) {
-        int writeIndex = writePos.load() % capacity;
+        int oldWritePos = writePos.load();
+        int writeIndex = oldWritePos % capacity;
+        if (oldWritePos > 0 && writeIndex == 0) {
+            DBG("RING BUFFER WRAP! writePos: " << oldWritePos << " -> " << writePos.load()
+                << ", capacity: " << capacity);
+        }
         buffer[writeIndex] = sample;
         writePos.fetch_add(1);
 
@@ -62,14 +67,16 @@ public:
         else if (before) {
             // Only have data before target - use most recent
             outValue = before->value;
+            //DBG("RB: only data before target!");
             return true;
         }
         else if (after) {
             // Only have data after target - use earliest
             outValue = after->value;
+            DBG("RB: only data after target!");
             return true;
         }
-
+        DBG("RB: No Valid Data found ;(");
         return false; // No valid data found
     }
 

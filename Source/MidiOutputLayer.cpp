@@ -16,21 +16,17 @@ void MidiOutputLayer::prepare (double fs)
 
 void MidiOutputLayer::process (int numSamples, juce::MidiBuffer& midi, int64_t blockStartSample)
     {
-        if (ring != nullptr) {
+        if (sync != nullptr && sync->isReady()) {
             for (int sampleInBlock = 0; sampleInBlock < numSamples; ++sampleInBlock)
             {
                 auto currentGlobalSample = blockStartSample + sampleInBlock;
 
                 if (currentGlobalSample >= nextCcSample)
                 {
-                    auto lookbackSample = currentGlobalSample - lookbackDelaySamples;
-                    float eegValue;
-                    if (ring && ring->getValueAtSample(lookbackSample, eegValue)) {
-                        auto midiValue = scaleEegToMidi(eegValue);
-                        auto midiMsg = juce::MidiMessage::controllerEvent(chan, cc, midiValue);
-                        midi.addEvent(midiMsg, sampleInBlock);
-                        //DBG ("Midi Value: " << midiValue << "eegValue" << eegValue);
-                    }
+                    float eegValue = sync->getEegValueAtTime(currentGlobalSample);
+                    auto midiValue = scaleEegToMidi(eegValue);
+                    auto midiMsg = juce::MidiMessage::controllerEvent(chan, cc, midiValue);
+                    midi.addEvent(midiMsg, sampleInBlock);
 
                     nextCcSample += samplesPerCc;
                 }
