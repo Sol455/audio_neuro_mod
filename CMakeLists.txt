@@ -9,7 +9,17 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 add_subdirectory(external/JUCE)
 
-add_subdirectory(external/liblsl)
+include(FetchContent)
+
+
+#add_subdirectory(external/liblsl)
+FetchContent_Declare(
+        liblsl
+        GIT_REPOSITORY https://github.com/sccn/liblsl.git
+        GIT_TAG v1.16.2
+)
+FetchContent_MakeAvailable(liblsl)
+
 
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Source)
 

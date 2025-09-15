@@ -4,6 +4,10 @@
 
 #include "dsp_worker.h"
 
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 void DSPWorker::prepare(double eegFs, double centreHz, double Q) {
     filtermod.prepare(eegFs, centreHz, Q);
 }
