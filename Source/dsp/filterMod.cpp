@@ -14,6 +14,12 @@ void filterMod::prepare (double fs, double centreHz, double Q)
     cf_.prepare(8.0, 12.0, fs, 0, 500, 2000);
 }
 
+void filterMod::setParameterReferences(std::atomic<float>* modDepth, std::atomic<float>* minModDepth)
+{
+    modDepthRef = modDepth;
+    minModDepthRef = minModDepth;
+}
+
 float filterMod::filter (float input) {
 
     //output_sample
@@ -24,6 +30,8 @@ float filterMod::makeModSignalReal(float sample, RunningPercentile& percentile)
 {
 
     //DBG ("Sample in: " << sample);
+    float mod_depth = modDepthRef ? modDepthRef->load() : 0.5f;
+    float min_mod_depth = minModDepthRef ? minModDepthRef->load() : 0.1f;
 
     //normalise raw sample
     float ref95 = percentile.getPercentile(0.95f); //7.688501426439704e-05 envelope_95_ref; //
@@ -37,7 +45,7 @@ float filterMod::makeModSignalReal(float sample, RunningPercentile& percentile)
     depth = juce::jlimit(0.0f, 1.0f, depth);
 
     //apply min/max modulation depth window
-    float modulator_signal = mod_min_depth + (1.0 - mod_min_depth) * depth;
+    float modulator_signal = min_mod_depth + (1.0 - min_mod_depth) * depth;
 
     return modulator_signal;
 
@@ -52,6 +60,8 @@ std::complex<float> filterMod::filterComplex (float input) {
 float filterMod::makeModSignalComplex(float env, float phase, float phase_offset, RunningPercentile& percentile)
 {
     float envelope_95_percentile = percentile.getPercentile(0.95f);
+    float mod_depth = modDepthRef ? modDepthRef->load() : 0.5f;
+    float min_mod_depth = minModDepthRef ? minModDepthRef->load() : 0.1f;
 
     //depth
     float depth = (env / envelope_95_percentile) * mod_depth;
@@ -69,7 +79,7 @@ float filterMod::makeModSignalComplex(float env, float phase, float phase_offset
     float amp_mod_component = depth * cos_shifted;
 
     //apply minimum modulation depth floor
-    float modulator_signal = mod_min_depth + (1.0f - mod_min_depth) * amp_mod_component;
+    float modulator_signal = min_mod_depth + (1.0f - min_mod_depth) * amp_mod_component;
 
     return modulator_signal;
 

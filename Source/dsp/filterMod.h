@@ -25,15 +25,21 @@ public:
 
     float makeModSignalComplex(float env, float phase, float phase_offset, RunningPercentile& percentile);
 
+    void setParameterReferences(std::atomic<float>* modDepth, std::atomic<float>* minModDepth);
+
 
 private:
+    //parameter refs
+    std::atomic<float>* modDepthRef = nullptr;
+    std::atomic<float>* minModDepthRef = nullptr;
+
     double fs_ = 0.0;
     juce::dsp::IIR::Filter<float> bp_;
     CFIRFilter cf_;
 
     double envelope_95_ref = 7.688501426439704;
-    double mod_depth = 0.9f;
-    double mod_min_depth = 0.15f;
+    // double mod_depth = 0.9f;
+    // double mod_min_depth = 0.15f;
 };
 
 #endif //AUDIO_NEURO_MOD_FILTER_H

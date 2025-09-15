@@ -38,7 +38,6 @@ void AudioEngine::process(juce::AudioBuffer<float>& buffer, const Parameters& pa
     if (params.mode == ModulationMode::OpenLoop)
     {
         processOpenLoopModulation(buffer, params);
-        DBG("open loop!");
     }
     else if (params.mode == ModulationMode::ClosedLoop && getModulationValue)
     {

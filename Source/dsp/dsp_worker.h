@@ -20,7 +20,7 @@ public:
     explicit DSPWorker (EegFIFO& src, EegRingBuf& dst, EegFIFO& ui, EegFIFO& uimod, EegFIFO& uiphase, Params::Cache& pCache
         )
         : juce::Thread ("DSP Worker"), sourceFIFO (src), destRING (dst), uiDestRawFIFO (ui), uiDestModFIFO (uimod), uiDestPhaseFIFO(uiphase), paramsCache(pCache){}
-    void prepare(double eegFs, double centreHz = 10.0, double Q = 2.0);
+    void prepare(double eegFs, double centreHz, double Q, std::atomic<float>* modDepth, std::atomic<float>* minModDepth);
 
     void startWorker() { if (! isThreadRunning()) startThread (Priority::high); }
     void stopWorker()  {percentile.clear(); signalThreadShouldExit(); stopThread (1500); }

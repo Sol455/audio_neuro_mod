@@ -154,7 +154,7 @@ void AudioPluginAudioProcessor::lsl_stream()
     lslWorker.setInlet (lsl_connector.inlet());
     lslWorker.setChannel(55);
     lslWorker.startWorker();
-    dspWorker.prepare(eegSampleRate, 10.0f, 2.0f);
+    dspWorker.prepare(eegSampleRate, 10.0f, 2.0f, paramsCache.modDepth, paramsCache.modMinDepth);
     dspWorker.startWorker();
 
 }
@@ -223,7 +223,6 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     };
 
     audioEngine.process(buffer, engineParams, getEEGModulation);
-
 
     globalSampleCounter.store(blockStartSample + samplesThisBlock);
 }
