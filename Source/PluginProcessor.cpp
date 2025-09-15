@@ -110,7 +110,7 @@ void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
     outputSync.setDelayMs(20.0f);
     outputSync.attachRing(&dspRingBuffer);
 
-    carrier.prepare(spec);
+    audioEngine.prepare(sampleRate, samplesPerBlock, getTotalNumOutputChannels());
     midiOut.attachSyncLayer(&outputSync);
     midiOut.setChannel(1);
     midiOut.setCcNumber(74);
@@ -194,42 +194,35 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
                                               juce::MidiBuffer& midiMessages)
 {
     juce::ignoreUnused (midiMessages);
-
     juce::ScopedNoDenormals noDenormals; // Maybe cut
+
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
-
-    const float freq = paramsCache.freq->load();
-    const float gain = paramsCache.gain->load();
-
     auto samplesThisBlock = buffer.getNumSamples();
     auto blockStartSample = globalSampleCounter.load();
 
+    //Clear input channels
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
+    //Process MIDI out
     midiOut.process(buffer.getNumSamples(),midiMessages, blockStartSample);
 
-    //float eegValue = outputSync.getEegValueAtTime(blockStartSample);
-    //DBG("EEG VALUE: " << eegValue );
+    AudioEngine::Parameters engineParams;
+    engineParams.carrierFreq = paramsCache.freq->load();
+    engineParams.carrierGain = paramsCache.gain->load();
+    engineParams.modDepth = 0.7;
+    engineParams.minModDepth = 0.15;
 
-    carrier.setFrequency(freq);
-    carrier.setAmplitude(gain);
-    carrier.process(buffer);
+    int modeIndex = static_cast<int>(paramsCache.processingMode->load());
+    engineParams.mode = (modeIndex == 0) ? AudioEngine::ModulationMode::ClosedLoop: AudioEngine::ModulationMode::OpenLoop;
 
-    for (int channel = 0; channel < buffer.getNumChannels(); ++channel) {
-        auto* channelData = buffer.getWritePointer(channel);
+    auto getEEGModulation = [this, blockStartSample](int64_t sampleOffset) -> float {
+        return outputSync.getEegValueAtTime(blockStartSample + sampleOffset);
+    };
 
-        for (int sample = 0; sample < buffer.getNumSamples(); ++sample) {
-            auto currentSample = blockStartSample + sample;
+    audioEngine.process(buffer, engineParams, getEEGModulation);
 
-            float eegValue = outputSync.getEegValueAtTime(currentSample);
-
-            eegValue = juce::jlimit(0.1f, 2.0f, eegValue);
-
-            channelData[sample] *= eegValue;
-        }
-    }
 
     globalSampleCounter.store(blockStartSample + samplesThisBlock);
 }

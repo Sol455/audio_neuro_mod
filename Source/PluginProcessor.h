@@ -2,6 +2,7 @@
 
 #include <juce_audio_processors/juce_audio_processors.h>
 #include "dsp/Carrier.h"
+#include "dsp/AudioEngine.h"
 #include "Params.h"
 #include "lsl/lsl_connector.h"
 #include "lsl/lsl_worker.h"
@@ -92,8 +93,11 @@ private:
     OutputSyncLayer outputSync;
     MidiOutputLayer midiOut;
 
-    Carrier carrier;
+    //Carrier carrier;
     Params::Cache paramsCache;
+
+    //Audio Engine
+    AudioEngine audioEngine;
 
     //Worker Threads
     LslWorker lslWorker { eegInletFIFO, stampMapper};
