@@ -52,6 +52,11 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    void setOnSampleRateDetected(std::function<void(float)> callback)
+    {
+        onSampleRateDetected = callback;
+    }
+
     juce::AudioProcessorValueTreeState apvts;
 
     bool connectLsl()   { return lsl_connector.connectFirstEEG(); }
@@ -67,6 +72,9 @@ public:
     EegFIFO& getUiModRing() { return uiModOutletFIFO; }
 
 private:
+
+    std::function<void(float)> onSampleRateDetected;
+
     std::atomic<int64_t> globalSampleCounter{0};
     LslConnector lsl_connector;
 

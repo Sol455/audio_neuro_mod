@@ -40,7 +40,6 @@ private:
 
     void calculatePhaseOffset();
 
-
     juce::TextButton connectButton, streamButton;
     juce::ComboBox channelSelector;
     juce::Label channelLabel;

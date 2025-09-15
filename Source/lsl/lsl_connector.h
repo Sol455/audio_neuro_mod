@@ -15,6 +15,11 @@ class LslConnector
 public:
     enum class Status { idle, connected, error };
 
+    void setOnConnectionCallback(std::function<void(double)> callback)
+    {
+        onConnectionCallback = callback;
+    }
+
     bool connectFirstEEG (double timeoutSec = 1.5)
     {
         try {
@@ -44,6 +49,9 @@ public:
             std::cout << "Connected to LSL stream: "
                       << info.name() << " [" << info.type() << "] "
                       << info.channel_count() << "ch @ " << info.nominal_srate() << " Hz\n";
+
+            if (onConnectionCallback)
+                onConnectionCallback(info.nominal_srate());
 
             return true;
         } catch (...) {
@@ -83,6 +91,7 @@ public:
     [[nodiscard]] lsl::stream_inlet* inlet() const { return inlet_.get(); }
 
 private:
+    std::function<void(double)> onConnectionCallback;
     std::unique_ptr<lsl::stream_inlet> inlet_;
     lsl::stream_info streamInfo_;
     bool hasStreamInfo_ = false;

@@ -15,6 +15,15 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
 
 {
     paramsCache.init(apvts);
+    lsl_connector.setOnConnectionCallback([this](double sampleRate)
+    {
+        // This gets called when LSL actually connects
+        juce::MessageManager::callAsync([this, sampleRate]()
+        {
+            if (onSampleRateDetected)
+                onSampleRateDetected(static_cast<float>(sampleRate));
+        });
+    });
 }
 
 AudioPluginAudioProcessor::~AudioPluginAudioProcessor()

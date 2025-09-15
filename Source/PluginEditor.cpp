@@ -89,18 +89,27 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     //EEG Scopes
     addAndMakeVisible (rawEegScope);
     rawEegScope.setAutoscale (true);
-    rawEegScope.setSource (&processorRef.getUiRawRing(), 160.0); //@TO-DO remove hardcoded value
+    rawEegScope.setSource (&processorRef.getUiRawRing(), 160.0); //init with default value
     rawEegScope.setTraceColour(juce::Colours::limegreen);
 
     addAndMakeVisible (phaseScope);
     phaseScope.setAutoscale (true);
-    phaseScope.setSource (&processorRef.getUiPhaseRing(), 160.0); //@TO-DO remove hardcoded value
+    phaseScope.setSource (&processorRef.getUiPhaseRing(), 160.0); //init with default value
     phaseScope.setTraceColour(juce::Colours::firebrick);
 
     addAndMakeVisible (modulationScope);
     modulationScope.setAutoscale (true);
-    modulationScope.setSource (&processorRef.getUiModRing(), 160.0); //@TO-DO remove hardcoded value
+    modulationScope.setSource (&processorRef.getUiModRing(), 160.0); //init with default value
     modulationScope.setTraceColour(juce::Colours::coral);
+
+    processorRef.setOnSampleRateDetected([this](float sampleRate)
+    {
+        rawEegScope.setSource (&processorRef.getUiRawRing(), sampleRate);
+        phaseScope.setSource (&processorRef.getUiPhaseRing(), sampleRate);
+        modulationScope.setSource (&processorRef.getUiModRing(), sampleRate);
+        DBG("LSL Steam Source updated. FS:" << sampleRate);
+
+    });
 
     //Channel Selector
     channelLabel.setText("EEG Channel:", juce::dontSendNotification);
