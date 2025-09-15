@@ -280,9 +280,10 @@ juce::AudioProcessorValueTreeState::ParameterLayout AudioPluginAudioProcessor::c
     juce::NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.5f));
 
     params.push_back(std::make_unique<juce::AudioParameterFloat>(Params::IDs::PhaseOffset, "Phase Offset",
-    juce::NormalisableRange<float>(-180.0f, 180.0f, 1.0f),
-        0.0f,
-        "°"));
+    juce::NormalisableRange<float>(-180.0f, 180.0f, 1.0f),0.0f,"°"));
+
+    params.push_back(std::make_unique<juce::AudioParameterChoice>(Params::IDs::ProcessingMode, "Processing Mode",
+    juce::StringArray{"Closed Loop", "Open Loop"}, 0));
 
     return { params.begin(), params.end() };
 

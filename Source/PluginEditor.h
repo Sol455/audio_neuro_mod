@@ -38,6 +38,11 @@ private:
     juce::TextEditor brainFreqInput;
     juce::TextButton calculateButton;
 
+    //processing mode
+    juce::ComboBox processingModeCombo;
+    juce::Label processingModeLabel;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> processingModeAttachment;
+
     void calculatePhaseOffset();
 
     juce::TextButton connectButton, streamButton;

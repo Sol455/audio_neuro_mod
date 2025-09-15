@@ -54,6 +54,8 @@ set(SourceFiles
         ${SRC_DIR}/dsp/CFIRFilter.h
         ${SRC_DIR}/dsp/CFIRFilter.cpp
         ${SRC_DIR}/dsp/RunningPercentile.h
+        ${SRC_DIR}/dsp/AudioEngine.h
+        ${SRC_DIR}/dsp/AudioEngine.cpp
 
         #UI
         ${SRC_DIR}/ui/EegScopeComponent.h

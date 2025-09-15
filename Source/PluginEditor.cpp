@@ -10,12 +10,12 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     addAndMakeVisible(gainSlider);
     addAndMakeVisible(phaseSlider);
 
-    freqSlider.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
-    gainSlider.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
+    freqSlider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
+    gainSlider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
     phaseSlider.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
 
-    freqSlider.setTextBoxStyle(juce::Slider::TextBoxLeft, true, 50, 13);
-    gainSlider.setTextBoxStyle(juce::Slider::TextBoxLeft, true, 50, 13);
+    freqSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 50, 13);
+    gainSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 50, 13);
     phaseSlider.setTextBoxStyle(juce::Slider::TextBoxLeft, true, 50, 13);
 
 
@@ -121,6 +121,21 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
 
     // Update channel list if already connected
     updateChannelSelector();
+
+    //Processing mode selection:
+
+    addAndMakeVisible(processingModeCombo);
+    processingModeCombo.addItem("Closed Loop", 1);
+    processingModeCombo.addItem("Open Loop", 2);
+
+    processingModeLabel.setText("Mode", juce::dontSendNotification);
+    addAndMakeVisible(processingModeLabel);
+
+    processingModeAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(
+        processorRef.apvts,
+        Params::IDs::ProcessingMode.getParamID(),
+        processingModeCombo
+    );
 
     startTimer(1000);
     setSize (800, 500);
@@ -232,42 +247,91 @@ void AudioPluginAudioProcessorEditor::paint (juce::Graphics& g)
 
 void AudioPluginAudioProcessorEditor::resized()
 {
-    connectButton.setBounds(getWidth()/ 2 - 150, getHeight()/2 + 150 , 100, 50);
-    streamButton.setBounds(getWidth()/ 2 - 50, getHeight()/2 + 150 , 100, 50);
 
-    auto scope_bounds = getLocalBounds().withSizeKeepingCentre(700, 300);
-    int thirdHeight = scope_bounds.getHeight() / 3;
+    auto bounds = getLocalBounds();
+    bounds.reduce(10, 10);
 
-    rawEegScope.setBounds(scope_bounds.removeFromTop(thirdHeight));
-    phaseScope.setBounds(scope_bounds.removeFromTop(thirdHeight));
-    modulationScope.setBounds(scope_bounds);
+    auto topControlsArea = bounds.removeFromTop(80);
+    auto scopeArea = bounds.removeFromTop(300);
+    auto bottomControlsArea = bounds;
 
-    channelLabel.setBounds(10, 10, 100, 25);
-    channelSelector.setBounds(120, 10, 150, 25);
+    auto topLeftControls = topControlsArea.removeFromLeft(topControlsArea.getWidth() / 2);
+    auto topRightControls = topControlsArea;
 
-    int scopeBottom = scope_bounds.getBottom(); // Use actual scope bounds
+    int buttonSpace = 2;
 
-    freqLabel.setBounds(getWidth() - 180, scopeBottom + 10, 160, 20);
-    freqSlider.setBounds(getWidth() - 180, scopeBottom + 35, 160, 25);
+    //=============================Top Left Controls================================
 
-    gainLabel.setBounds(getWidth() - 180, scopeBottom + 70, 160, 20);
-    gainSlider.setBounds(getWidth() - 180, scopeBottom + 50, 160, 25);
+    auto tlThird = topLeftControls.getHeight()/3;
+    //Top left controls
+    auto topLeftRow1 = topLeftControls.removeFromTop(tlThird);
+    channelLabel.setBounds(topLeftRow1.removeFromLeft(100));
+    topLeftRow1.removeFromLeft(buttonSpace);
+    channelSelector.setBounds(topLeftRow1.removeFromLeft(150));
+    topLeftRow1.removeFromLeft(buttonSpace);
+    connectButton.setBounds(topLeftRow1.removeFromLeft(100));
 
-    phaseLabel.setBounds(getWidth() - 180, scopeBottom - 370, 160, 20);
-    phaseSlider.setBounds(getWidth() - 180, scopeBottom - 350, 160, 25);
+    auto topLeftRow2 = topLeftControls.removeFromTop(tlThird);
+    processingModeLabel.setBounds(topLeftRow2.removeFromLeft(100));
+    topLeftRow2.removeFromLeft(buttonSpace); // Small gap
+    processingModeCombo.setBounds(topLeftRow2.removeFromLeft(150));
+    topLeftRow2.removeFromLeft(buttonSpace);
+    streamButton.setBounds(topLeftRow2.removeFromLeft(100));
 
-    int helperStartX = getWidth() - 180 - 150;
-    int helperStartY = scopeBottom - 400;
+    topLeftControls.reduce(20, 5);
 
-    systemDelayLabel.setBounds(helperStartX, helperStartY, 80, 20);
-    systemDelayInput.setBounds(helperStartX + 85, helperStartY, 60, 20);
+    //===========================Top Right controls=========================
 
-    desiredPhaseLabel.setBounds(helperStartX, helperStartY + 25, 80, 20);
-    desiredPhaseInput.setBounds(helperStartX + 85, helperStartY + 25, 60, 20);
+    auto columnsplit = topRightControls.getWidth() / 2;
 
-    brainFreqLabel.setBounds(helperStartX, helperStartY + 50, 80, 20);
-    brainFreqInput.setBounds(helperStartX + 85, helperStartY + 50, 60, 20);
+    auto tr_column_1 = topRightControls.removeFromRight(columnsplit);
+    phaseLabel.setBounds(tr_column_1.removeFromTop(20));
+    tr_column_1.removeFromTop(buttonSpace); // Small gap
+    phaseSlider.setBounds(tr_column_1.removeFromTop(25));
 
-    calculateButton.setBounds(helperStartX, helperStartY + 80, 100, 25);
+    auto tr_column_2 = topRightControls;
+    auto tr_row_helper = topRightControls.getHeight() /4;
+
+    auto delayRow = tr_column_2.removeFromTop(tr_row_helper);
+    systemDelayLabel.setBounds(delayRow.removeFromLeft(80));
+    delayRow.removeFromLeft(5);
+    systemDelayInput.setBounds(delayRow.removeFromLeft(60));
+
+    auto desiredRow = tr_column_2.removeFromTop(tr_row_helper);
+    desiredPhaseLabel.setBounds(desiredRow.removeFromLeft(80));
+    desiredRow.removeFromLeft(5);
+    desiredPhaseInput.setBounds(desiredRow.removeFromLeft(60));
+
+    auto freqRow = tr_column_2.removeFromTop(tr_row_helper);
+    brainFreqLabel.setBounds(freqRow.removeFromLeft(80));
+    freqRow.removeFromLeft(5);
+    brainFreqInput.setBounds(freqRow.removeFromLeft(60));
+
+    auto calcRow = tr_column_2;
+    calculateButton.setBounds(calcRow.removeFromLeft(100));
+
+    //===========================Scope Bounds=========================
+    int scopeHeight = scopeArea.getHeight() / 3;
+
+    rawEegScope.setBounds(scopeArea.removeFromTop(scopeHeight));
+    phaseScope.setBounds(scopeArea.removeFromTop(scopeHeight));
+    modulationScope.setBounds(scopeArea);
+
+    //==========================Bottom Controls=======================
+
+    auto leftMarginArea = bottomControlsArea.removeFromLeft(20);
+    auto freqControlArea = bottomControlsArea.removeFromLeft(60);
+    auto spacingArea = bottomControlsArea.removeFromLeft(20);
+    auto gainControlArea = bottomControlsArea.removeFromLeft(60);
+
+    // Frequency controls
+    freqLabel.setBounds(freqControlArea.removeFromTop(25));
+    freqSlider.setBounds(freqControlArea);
+
+    // Gain controls
+    gainLabel.setBounds(gainControlArea.removeFromTop(25));
+    gainSlider.setBounds(gainControlArea);
+
+
 }
 
