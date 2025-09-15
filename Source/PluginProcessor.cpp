@@ -211,8 +211,9 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     AudioEngine::Parameters engineParams;
     engineParams.carrierFreq = paramsCache.freq->load();
     engineParams.carrierGain = paramsCache.gain->load();
-    engineParams.modDepth = 0.7;
-    engineParams.minModDepth = 0.15;
+    engineParams.modDepth = paramsCache.modDepth->load();
+    engineParams.minModDepth = paramsCache.modMinDepth->load();
+    engineParams.modFreq = paramsCache.modFreq->load();
 
     int modeIndex = static_cast<int>(paramsCache.processingMode->load());
     engineParams.mode = (modeIndex == 0) ? AudioEngine::ModulationMode::ClosedLoop: AudioEngine::ModulationMode::OpenLoop;
@@ -277,6 +278,12 @@ juce::AudioProcessorValueTreeState::ParameterLayout AudioPluginAudioProcessor::c
 
     params.push_back(std::make_unique<juce::AudioParameterChoice>(Params::IDs::ProcessingMode, "Processing Mode",
     juce::StringArray{"Closed Loop", "Open Loop"}, 0));
+
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(Params::IDs::ModDepth, "Depth",juce::NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.7f));
+
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(Params::IDs::ModMinDepth, "Min Depth", juce::NormalisableRange<float>(0.1f, 1.0f, 0.01f), 0.15f));
+
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(Params::IDs::ModFreq, "Min Depth", juce::NormalisableRange<float>(0.1f, 20.0f, 0.01f), 10.0f));
 
     return { params.begin(), params.end() };
 

@@ -9,15 +9,23 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     addAndMakeVisible(freqSlider);
     addAndMakeVisible(gainSlider);
     addAndMakeVisible(phaseSlider);
+    addAndMakeVisible(modDepthSlider);
+    addAndMakeVisible(modMinDepthSlider);
+    addAndMakeVisible(modFreqSlider);
 
     freqSlider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
     gainSlider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
     phaseSlider.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
+    modDepthSlider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
+    modMinDepthSlider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
+    modFreqSlider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
 
     freqSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 50, 13);
     gainSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 50, 13);
     phaseSlider.setTextBoxStyle(juce::Slider::TextBoxLeft, true, 50, 13);
-
+    modDepthSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 50, 13);
+    modMinDepthSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 50, 13);
+    modFreqSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 50, 13);
 
     gainSliderAttachment  = std::make_unique<SliderAttachment>(processorRef.apvts, Params::IDs::Gain.getParamID()
 , gainSlider);
@@ -25,6 +33,12 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
 , freqSlider);
     phaseSliderAttachment  = std::make_unique<SliderAttachment>(processorRef.apvts, Params::IDs::PhaseOffset.getParamID()
 , phaseSlider);
+    modDepthSliderAttachment = std::make_unique<SliderAttachment>(processorRef.apvts, Params::IDs::ModDepth.getParamID()
+, modDepthSlider);
+    modMinDepthSliderAttachment= std::make_unique<SliderAttachment>(processorRef.apvts, Params::IDs::ModMinDepth.getParamID()
+, modMinDepthSlider);
+    modFreqSliderAttachment = std::make_unique<SliderAttachment>(processorRef.apvts, Params::IDs::ModFreq.getParamID()
+, modFreqSlider);
 
     freqLabel.setJustificationType(juce::Justification::centred);
     addAndMakeVisible(freqLabel);
@@ -32,6 +46,12 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     addAndMakeVisible(gainLabel);
     phaseLabel.setJustificationType(juce::Justification::centred);
     addAndMakeVisible(phaseLabel);
+    modDepthLabel.setJustificationType(juce::Justification::centred);
+    addAndMakeVisible(modDepthLabel);
+    minModDepthLabel.setJustificationType(juce::Justification::centred);
+    addAndMakeVisible(minModDepthLabel);
+    modFreqLabel.setJustificationType(juce::Justification::centred);
+    addAndMakeVisible(modFreqLabel);
 
     addAndMakeVisible(connectButton);
     connectButton.setButtonText("Connect");
@@ -319,10 +339,19 @@ void AudioPluginAudioProcessorEditor::resized()
 
     //==========================Bottom Controls=======================
 
-    auto leftMarginArea = bottomControlsArea.removeFromLeft(20);
+    auto slider_space = 15;
+
+    bottomControlsArea.removeFromLeft(slider_space);
     auto freqControlArea = bottomControlsArea.removeFromLeft(60);
-    auto spacingArea = bottomControlsArea.removeFromLeft(20);
+    bottomControlsArea.removeFromLeft(slider_space);
     auto gainControlArea = bottomControlsArea.removeFromLeft(60);
+     bottomControlsArea.removeFromLeft(slider_space);
+    auto modDepthArea = bottomControlsArea.removeFromLeft(60);
+    bottomControlsArea.removeFromLeft(slider_space);
+    auto modMinDepthArea = bottomControlsArea.removeFromLeft(60);
+    bottomControlsArea.removeFromLeft(slider_space);
+    auto modFreqArea = bottomControlsArea.removeFromLeft(60);
+
 
     // Frequency controls
     freqLabel.setBounds(freqControlArea.removeFromTop(25));
@@ -332,6 +361,15 @@ void AudioPluginAudioProcessorEditor::resized()
     gainLabel.setBounds(gainControlArea.removeFromTop(25));
     gainSlider.setBounds(gainControlArea);
 
+    //Mod Controls
+    modDepthLabel.setBounds(modDepthArea.removeFromTop(25));
+    modDepthSlider.setBounds(modDepthArea);
+
+    minModDepthLabel.setBounds(modMinDepthArea.removeFromTop(25));
+    modMinDepthSlider.setBounds(modMinDepthArea);
+
+    modFreqLabel.setBounds(modFreqArea.removeFromTop(25));
+    modFreqSlider.setBounds(modFreqArea);
 
 }
 

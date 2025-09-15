@@ -33,7 +33,6 @@ void DSPWorker::process (const EegSample& sample_in)
 
     //const float mod_signal = filtermod.makeModSignalReal(sample_in.value, percentile);
 
-
     const EegSample mod_out { mod_signal, sample_in.stamp };
 
     const EegSample phase_out { phase, sample_in.stamp };
