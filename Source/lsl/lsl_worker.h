@@ -26,7 +26,8 @@ public:
 private:
     void run() override
     {
-        std::vector<float> oneSample; // resize once we know channel count
+        std::vector<std::vector<float>> chunk_data;
+        std::vector<double> chunk_timestamps;
         int chCount = 0;
 
         while (! threadShouldExit())
@@ -40,35 +41,29 @@ private:
                 catch (...) { juce::Thread::sleep (5); continue; }
 
                 if (chCount <= 0) { juce::Thread::sleep (5); continue; }
-                oneSample.resize ((size_t) chCount);
             }
 
             const int wantCh = juce::jlimit (0, chCount - 1, channel.load (std::memory_order_relaxed));
 
-            double ts = 0.0; // non blocking
+            bool got_data = false;
             try {
-                ts = in->pull_sample (oneSample.data(), chCount, /*timeout*/ 0.0);
+                got_data = in->pull_chunk(chunk_data, chunk_timestamps);
             } catch (...) {
-                juce::Thread::sleep(2);
+                juce::Thread::sleep(1); // time out if no data ready
                 continue;
             }
 
-            if (ts != 0.0)  //sample got
-            {
-                int64_t hostSampleIndex = stampMapper.toHostSample(ts);
-                EegSample sample{oneSample[(size_t) wantCh], hostSampleIndex};
+            if (got_data && !chunk_data.empty()) {
+                for (size_t i = 0; i < chunk_data.size(); ++i) {
+                    if (chunk_data[i].size() > wantCh) {
+                        int64_t hostSampleIndex = stampMapper.toHostSample(chunk_timestamps[i]);
+                        EegSample sample{chunk_data[i][wantCh], hostSampleIndex};
 
-                if (!ring.addSample(sample)) {
-                    // Ring full; drop one sample
-                    juce::Thread::sleep(2);
-                    std::cout << "LSL outlet buffer full" << std::endl;
-
+                        if (!ring.addSample(sample)) {
+                            std::cout << "LSL outlet buffer full" << std::endl;
+                        }
+                    }
                 }
-            }
-            else
-            {
-                // No sample ready
-                juce::Thread::sleep(2);
             }
         }
     }

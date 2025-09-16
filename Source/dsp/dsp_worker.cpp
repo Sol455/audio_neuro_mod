@@ -40,19 +40,19 @@ void DSPWorker::process (const EegSample& sample_in)
 
     //Write out samples to the UI OUTLETs
     if (!uiDestRawFIFO.addSample(sample_in)) {
-        DBG("UI Raw FIFO full");
+        std::cout << "UI Raw FIFO full" << std::endl;
 
         // Dest Full, Drop one
     }
 
     if (!uiDestPhaseFIFO.addSample(phase_out)) {
-        DBG("UI Phase FIFO full");
+        std::cout << "UI Phase FIFO full" << std::endl;
 
         // Dest Full, Drop one
     }
 
     if (!uiDestModFIFO.addSample(mod_out)) {
-        DBG("UI Mod FIFO full");
+        std::cout << "UI Mod FIFO full" << std::endl;
 
         // Dest Full, Drop one
     }
