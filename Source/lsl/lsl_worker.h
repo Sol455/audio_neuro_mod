@@ -49,7 +49,7 @@ private:
             try {
                 ts = in->pull_sample (oneSample.data(), chCount, /*timeout*/ 0.0);
             } catch (...) {
-                juce::Thread::yield();
+                juce::Thread::sleep(2);
                 continue;
             }
 
@@ -60,13 +60,13 @@ private:
 
                 if (!ring.addSample(sample)) {
                     // Ring full; drop one sample
-                    juce::Thread::yield();
+                    //juce::Thread::yield();
                 }
             }
             else
             {
                 // No sample ready
-                juce::Thread::yield();
+                juce::Thread::sleep(2);
             }
         }
     }

@@ -68,7 +68,8 @@ void DSPWorker::run()
             else
             {
                 // No sample ready
-                juce::Thread::yield();
+                juce::Thread::sleep(2);
+
             }
         }
 }

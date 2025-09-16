@@ -19,7 +19,7 @@ public:
         ring = rb;
         fs   = fsHz;
         samplesPerFrame = juce::jlimit (32, 4096, (int) (fs * 0.05)); // ~50 ms per repaint
-        startTimerHz (50); // ~30 FPS
+        startTimerHz (25); 
     }
 
     void setAutoscale (bool enabled) { autoscale = enabled; }
