@@ -152,7 +152,7 @@ void AudioPluginAudioProcessor::lsl_stream()
     DBG("LSL Steam. Channel Count=" << eegNumShannels << " Samplerate=" << eegSampleRate);
 
     lslWorker.setInlet (lsl_connector.inlet());
-    lslWorker.setChannel(55);
+    lslWorker.setChannel(0);
     lslWorker.startWorker();
     dspWorker.prepare(eegSampleRate, 10.0f, 2.0f, paramsCache.modDepth, paramsCache.modMinDepth);
     dspWorker.startWorker();
