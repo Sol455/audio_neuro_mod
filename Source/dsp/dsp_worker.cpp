@@ -4,6 +4,8 @@
 
 #include "dsp_worker.h"
 
+#include <chrono>
+
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
@@ -15,12 +17,8 @@ void DSPWorker::prepare(double eegFs, double centreHz, double Q, std::atomic<flo
 
 void DSPWorker::process (const EegSample& sample_in)
 {
-    //DSP Chain here:
-    percentile.addSample(sample_in.value);
 
-    //REAL processing
-    // const float filtered_signal = filtermod.filter(sample_in.value);
-    // const float mod_signal = filtermod.makeModSignalReal(filtered_signal, percentile);
+    percentile.addSample(sample_in.value);
 
     //COMPLEX processing
     std::complex<float> analytic = filtermod.filterComplex(sample_in.value);
@@ -32,10 +30,8 @@ void DSPWorker::process (const EegSample& sample_in)
 
     const float mod_signal = filtermod.makeModSignalComplex(envelope, phase, phaseOffsetRadians, percentile);
 
-    //const float mod_signal = filtermod.makeModSignalReal(sample_in.value, percentile);
 
     const EegSample mod_out { mod_signal, sample_in.stamp };
-
     const EegSample phase_out { phase, sample_in.stamp };
 
 
@@ -44,19 +40,19 @@ void DSPWorker::process (const EegSample& sample_in)
 
     //Write out samples to the UI OUTLETs
     if (!uiDestRawFIFO.addSample(sample_in)) {
-        std::cout << "UI Raw FIFO full" << std::endl;
+        DBG("UI Raw FIFO full");
 
         // Dest Full, Drop one
     }
 
     if (!uiDestPhaseFIFO.addSample(phase_out)) {
-        std::cout << "UI Phase FIFO full" << std::endl;
+        DBG("UI Phase FIFO full");
 
         // Dest Full, Drop one
     }
 
     if (!uiDestModFIFO.addSample(mod_out)) {
-        std::cout << "UI Mod FIFO full" << std::endl;
+        DBG("UI Mod FIFO full");
 
         // Dest Full, Drop one
     }
@@ -74,8 +70,52 @@ void DSPWorker::run()
             else
             {
                 // No sample ready
-                juce::Thread::sleep(2);
+                juce::Thread::yield();
 
             }
         }
+}
+
+void DSPWorker::run_and_profile()
+{
+    SimpleProfiler processProfiler;
+    auto lastPrintTime = std::chrono::high_resolution_clock::now();
+
+    while (!threadShouldExit())
+    {
+        // Print stats every 100ms
+        auto now = std::chrono::high_resolution_clock::now();
+        auto timeSinceLastPrint = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastPrintTime);
+
+        if (timeSinceLastPrint.count() >= 100) {
+            auto now_c = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+
+            std::cout << "Time: " << std::put_time(std::localtime(&now_c), "%H:%M:%S")
+                      << " | FIFO: " << sourceFIFO.available() << "/" << sourceFIFO.capacity()
+                      << " (" << (100.0f * sourceFIFO.available() / sourceFIFO.capacity()) << "%)"
+                      << " | Process avg: " << std::fixed << std::setprecision(3) << processProfiler.getAverage() << "ms"
+                      << std::endl;
+
+            processProfiler.reset();
+            lastPrintTime = now;
+        }
+
+        EegSample sample;
+        if (sourceFIFO.readSample(sample)) {
+
+            processProfiler.start();
+            process(sample);
+            processProfiler.stop();
+
+            // Warn on slow calls
+            if (processProfiler.getTime() > 10.0) {
+                std::cout << "WARNING: Slow process() call took " << processProfiler.getTime() << "ms" << std::endl;
+            }
+        }
+        else
+        {
+            // No sample ready
+            juce::Thread::yield();
+        }
+    }
 }

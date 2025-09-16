@@ -13,6 +13,7 @@
 #include "../lsl/EegRingBuf.h"
 #include "RunningPercentile.h"
 #include "../Params.h"
+#include "simpleProfiler.h"
 
 class DSPWorker : private juce::Thread
 {
@@ -29,6 +30,8 @@ private:
     void process(const EegSample& sample);
 
     void run() override;
+
+    void run_and_profile();
 
     RunningPercentile percentile;
 

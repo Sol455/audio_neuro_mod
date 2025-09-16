@@ -34,7 +34,7 @@ float filterMod::makeModSignalReal(float sample, RunningPercentile& percentile)
     float min_mod_depth = minModDepthRef ? minModDepthRef->load() : 0.1f;
 
     //normalise raw sample
-    float ref95 = percentile.getPercentile(0.95f); //7.688501426439704e-05 envelope_95_ref; //
+    float ref95 = percentile.getPercentile(0.95f); // 7.688501426439704e-05; envelope_95_ref; //
 
     float depth = 0.5f * ((sample / ref95) + 1.0f);
 

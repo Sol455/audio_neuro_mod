@@ -56,6 +56,7 @@ set(SourceFiles
         ${SRC_DIR}/dsp/RunningPercentile.h
         ${SRC_DIR}/dsp/AudioEngine.h
         ${SRC_DIR}/dsp/AudioEngine.cpp
+        ${SRC_DIR}/dsp/simpleProfiler.h
 
         #UI
         ${SRC_DIR}/ui/EegScopeComponent.h

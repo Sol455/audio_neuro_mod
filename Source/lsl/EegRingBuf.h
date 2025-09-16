@@ -98,6 +98,27 @@ public:
         return false;
     }
 
+    // Helper method to pull out all values for running percentile
+    std::vector<float> getAllValues() {
+        std::vector<float> result;
+        int numValid = validSamples.load();
+        if (numValid == 0) return result;
+
+        result.reserve(numValid);
+        int startIdx = juce::jmax(0, writePos.load() - numValid);
+        int endIdx = writePos.load();
+
+        for (int i = startIdx; i < endIdx; ++i) {
+            result.push_back(buffer[i % capacity].value);
+        }
+        return result;
+    }
+
+    void clear() {
+        writePos.store(0);
+        validSamples.store(0);
+    }
+
 private:
     std::vector<EegSample> buffer;
     int capacity;

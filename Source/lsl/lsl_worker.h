@@ -60,7 +60,9 @@ private:
 
                 if (!ring.addSample(sample)) {
                     // Ring full; drop one sample
-                    //juce::Thread::yield();
+                    juce::Thread::sleep(2);
+                    std::cout << "LSL outlet buffer full" << std::endl;
+
                 }
             }
             else
