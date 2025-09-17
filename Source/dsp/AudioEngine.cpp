@@ -18,12 +18,16 @@ void AudioEngine::prepare(double sampleRate, int samplesPerBlock, int numOutputC
 
     carrier.prepare(carrierSpec);
 
+    lowPassFilter.prepare(carrierSpec);
+    lowPassFilter.setType(juce::dsp::StateVariableTPTFilterType::lowpass);
+
     juce::dsp::ProcessSpec modSpec;
     modSpec.sampleRate = sampleRate;
     modSpec.maximumBlockSize = samplesPerBlock;
     modSpec.numChannels = 1; // Single channel for mod signal
 
     sineModulator.prepare(modSpec);
+
 }
 
 void AudioEngine::process(juce::AudioBuffer<float>& buffer, const Parameters& params,
@@ -34,53 +38,96 @@ void AudioEngine::process(juce::AudioBuffer<float>& buffer, const Parameters& pa
     carrier.setAmplitude(params.carrierGain);
     carrier.process(buffer);
 
+    std::vector<float> modValues;
+
     // Apply modulation
     if (params.mode == ModulationMode::OpenLoop)
     {
-        processOpenLoopModulation(buffer, params);
+        //processOpenLoopModulation(buffer, params);
+        modValues = generateOLModulationValues(buffer.getNumSamples(), params);
     }
     else if (params.mode == ModulationMode::ClosedLoop && getModulationValue)
     {
-        processClosedLoopModulation(buffer, getModulationValue);
+        //processClosedLoopModulation(buffer, getModulationValue);
+        modValues = generateCLModulationValues(buffer.getNumSamples(),getModulationValue);
+
     }
+
+    //processFilterSweep(buffer,params);
+    //processOpenLoopModulation(buffer, params);
+    applyFilterModulation(buffer, modValues);
+
 }
 
-void AudioEngine::processOpenLoopModulation(juce::AudioBuffer<float>& buffer, const Parameters& params)
+std::vector<float> AudioEngine::generateCLModulationValues(int numSamples, const std::function<float(int64_t)>& getModulationValue)
+{
+    std::vector<float> modValues(numSamples);
+
+    for (int sample = 0; sample < numSamples; ++sample)
+    {
+        // Get raw mod value
+        float modValue = getModulationValue(sample);
+        modValues[sample] = juce::jlimit(0.1f, 1.0f, modValue);
+    }
+
+    return modValues;
+}
+
+std::vector<float> AudioEngine::generateOLModulationValues(int numSamples, const Parameters& params)
 {
     sineModulator.setFrequency(params.modFreq);
 
-    std::vector<float> modValues(buffer.getNumSamples());
+    std::vector<float> modValues(numSamples);
 
-    for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
+    for (int sample = 0; sample < numSamples; ++sample)
     {
-        float modValue = (sineModulator.processSample(0.0f) + 1.0f) * 0.5f;
-        float ampModComponent = params.modDepth * modValue;
-        modValues[sample] = params.minModDepth + (1.0f - params.minModDepth) * ampModComponent;
+        float modValue = (sineModulator.processSample(0.0f) + 1.0f) * 0.5f; // 0 to 1
+        float scaledMod = params.modDepth * modValue;
+        modValues[sample] = params.minModDepth + (1.0f - params.minModDepth) * scaledMod;
     }
 
-    for (int channel = 0; channel < buffer.getNumChannels(); ++channel)
+    return modValues;
+}
+
+//apply amplitude modulation
+void AudioEngine::applyAmplitudeModulation(juce::AudioBuffer<float>& buffer, const std::vector<float>& modValues)
+{
+    const int numChannels = buffer.getNumChannels();
+    const int numSamples = buffer.getNumSamples();
+
+    for (int channel = 0; channel < numChannels; ++channel)
     {
         auto* channelData = buffer.getWritePointer(channel);
-        for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
+        for (int sample = 0; sample < numSamples; ++sample)
         {
             channelData[sample] *= modValues[sample];
         }
     }
 }
 
-void AudioEngine::processClosedLoopModulation(juce::AudioBuffer<float>& buffer,
-                                             const std::function<float(int64_t)>& getModulationValue)
+// Apply filter modulation
+void AudioEngine::applyFilterModulation(juce::AudioBuffer<float>& buffer, const std::vector<float>& modValues)
 {
-    for (int channel = 0; channel < buffer.getNumChannels(); ++channel)
+    const int numSamples = buffer.getNumSamples();
+    const int numChannels = buffer.getNumChannels();
+    const int updateRate = 32;
+
+    const float minCutoff = 50.0f;
+    const float maxCutoff = 1000.0f;
+
+    for (int sample = 0; sample < numSamples; ++sample)
     {
-        auto* channelData = buffer.getWritePointer(channel);
-
-        for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
+        if (sample % updateRate == 0)
         {
-            float modValue = getModulationValue(sample);
-            modValue = juce::jlimit(0.1f, 1.0f, modValue);
+            float cutoff = minCutoff + (maxCutoff - minCutoff) * modValues[sample];
+            lowPassFilter.setCutoffFrequency(cutoff);
+        }
 
-            channelData[sample] *= modValue;
+        for (int channel = 0; channel < numChannels; ++channel)
+        {
+            auto* channelData = buffer.getWritePointer(channel);
+            channelData[sample] = lowPassFilter.processSample(channel, channelData[sample]);
         }
     }
 }
+

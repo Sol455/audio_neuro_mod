@@ -46,6 +46,12 @@ private:
     juce::Label processingModeLabel;
     std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> processingModeAttachment;
 
+    //mod mode
+    //processing mode
+    juce::ComboBox modModeCombo;
+    juce::Label modModeLabel;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> modModeAttachment;
+
     void calculatePhaseOffset();
 
     juce::TextButton connectButton, streamButton;

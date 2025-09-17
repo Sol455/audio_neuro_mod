@@ -284,6 +284,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout AudioPluginAudioProcessor::c
 
     params.push_back(std::make_unique<juce::AudioParameterFloat>(Params::IDs::ModFreq, "Min Depth", juce::NormalisableRange<float>(0.1f, 20.0f, 0.01f), 10.0f));
 
+    params.push_back(std::make_unique<juce::AudioParameterChoice>(Params::IDs::ProcessingMode, "Mod Mode",juce::StringArray{"AM", "FM", "ISO"}, 0));
+
     return { params.begin(), params.end() };
 
 }

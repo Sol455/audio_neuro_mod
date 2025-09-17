@@ -14,13 +14,17 @@ class AudioEngine
 public:
     enum class ModulationMode { OpenLoop, ClosedLoop };
 
+    enum class ModulationType {AM, FilterSweep};
+
     struct Parameters {
         float carrierFreq = 440.0f;
         float carrierGain = 0.5f;
         float modFreq = 10.0f;
         float modDepth = 0.7f;
         float minModDepth = 0.15f;
-        ModulationMode mode = ModulationMode::OpenLoop;
+        float filterCutoff = 1000.0f;
+        float filterQ = 0.707f;
+        ModulationMode mode = ModulationMode::ClosedLoop;
     };
 
     AudioEngine();
@@ -32,9 +36,15 @@ public:
 private:
     Carrier carrier;
     juce::dsp::Oscillator<float> sineModulator;
+    juce::dsp::StateVariableTPTFilter<float> lowPassFilter;
 
-    void processOpenLoopModulation(juce::AudioBuffer<float>& buffer, const Parameters& params);
-    void processClosedLoopModulation(juce::AudioBuffer<float>& buffer, const std::function<float(int64_t)>& getModulationValue);
+
+    std::vector<float> generateOLModulationValues(int numSamples, const Parameters& params);
+    std::vector<float> generateCLModulationValues(int numSamples, const std::function<float(int64_t)>& getModulationValue);
+
+    void applyAmplitudeModulation(juce::AudioBuffer<float>& buffer, const std::vector<float>& modValues);
+    void applyFilterModulation(juce::AudioBuffer<float>& buffer, const std::vector<float>& modValues);
+
 };
 
 #endif //AUDIO_NEURO_MOD_AUDIOENGINE_H

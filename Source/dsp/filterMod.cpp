@@ -11,7 +11,7 @@ void filterMod::prepare (double fs, double centreHz, double Q)
     setBand(centreHz, Q);
     bp_.reset();
 
-    cf_.prepare(8.0, 12.0, fs, 0, 500, 2000);
+    cf_.prepare(8.0, 12.0, fs, 50, 500, 2000);
 }
 
 void filterMod::setParameterReferences(std::atomic<float>* modDepth, std::atomic<float>* minModDepth)

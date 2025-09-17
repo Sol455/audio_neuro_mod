@@ -16,6 +16,7 @@ void Carrier::prepare (const juce::dsp::ProcessSpec& s)
     }
 }
 
+
 void Carrier::process (juce::AudioBuffer<float>& buffer)
 {
     jassert ((int) spec.numChannels == buffer.getNumChannels());

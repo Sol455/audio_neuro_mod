@@ -52,6 +52,8 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     addAndMakeVisible(minModDepthLabel);
     modFreqLabel.setJustificationType(juce::Justification::centred);
     addAndMakeVisible(modFreqLabel);
+    modModeLabel.setJustificationType(juce::Justification::centred);
+    addAndMakeVisible(modModeLabel);
 
     addAndMakeVisible(connectButton);
     connectButton.setButtonText("Connect");
@@ -155,6 +157,21 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
         processorRef.apvts,
         Params::IDs::ProcessingMode.getParamID(),
         processingModeCombo
+    );
+
+    addAndMakeVisible(modModeCombo);
+    modModeCombo.addItem("AM", 1);
+    modModeCombo.addItem("FM", 2);
+    modModeCombo.addItem("ISO", 3);
+
+
+    modModeLabel.setText("Mod Mode", juce::dontSendNotification);
+    addAndMakeVisible(processingModeLabel);
+
+    modModeAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(
+        processorRef.apvts,
+        Params::IDs::ModMode.getParamID(),
+        modModeCombo
     );
 
     startTimer(1000);
@@ -340,7 +357,8 @@ void AudioPluginAudioProcessorEditor::resized()
     //==========================Bottom Controls=======================
 
     auto slider_space = 15;
-
+    bottomControlsArea.removeFromLeft(slider_space);
+    auto modModeArea = bottomControlsArea.removeFromLeft(60);
     bottomControlsArea.removeFromLeft(slider_space);
     auto freqControlArea = bottomControlsArea.removeFromLeft(60);
     bottomControlsArea.removeFromLeft(slider_space);
@@ -352,6 +370,8 @@ void AudioPluginAudioProcessorEditor::resized()
     bottomControlsArea.removeFromLeft(slider_space);
     auto modFreqArea = bottomControlsArea.removeFromLeft(60);
 
+    modModeLabel.setBounds(modModeArea.removeFromTop(25));
+    modModeCombo.setBounds(modModeArea.removeFromTop(40));
 
     // Frequency controls
     freqLabel.setBounds(freqControlArea.removeFromTop(25));
