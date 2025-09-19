@@ -29,7 +29,6 @@ public:
         // Read rate: ~ produced per frame
         const int targetFps = 30;
         startTimerHz(targetFps);
-        samplesPerFrame = juce::jmax(1, (int)std::lround(fs / (double)targetFps));
     }
 
     void setAutoscale (bool enabled) { autoscale = enabled; }
@@ -86,27 +85,28 @@ private:
         if (ring == nullptr || circularBuffer.empty())
             return;
 
-        // Read new samples from ring
-        auto rv = ring->beginRead(samplesPerFrame);
+        // Drain everything
+        const int available = ring->available();
+        if (available == 0)
+            return;
+
+        auto rv = ring->beginRead(available);
         const int n = rv.total();
 
         if (n > 0)
         {
-            int samplesWritten = 0;
             const int bufferSize = (int)circularBuffer.size();
 
-            for (int i = 0; i < rv.n1 && samplesWritten < n; ++i)
+            for (int i = 0; i < rv.n1; ++i)
             {
                 circularBuffer[writeIndex] = rv.p1[i].value;
                 writeIndex = (writeIndex + 1) % bufferSize;
-                ++samplesWritten;
             }
 
-            for (int i = 0; i < rv.n2 && samplesWritten < n; ++i)
+            for (int i = 0; i < rv.n2; ++i)
             {
                 circularBuffer[writeIndex] = rv.p2[i].value;
                 writeIndex = (writeIndex + 1) % bufferSize;
-                ++samplesWritten;
             }
 
             ring->finishRead(n);
@@ -117,7 +117,6 @@ private:
     EegFIFO* ring = nullptr;
     double fs = 0.0;
     float windowSeconds = 2.0f;
-    int samplesPerFrame = 8;
     bool autoscale = true;
     float thickness = 1.5f;
     juce::Colour traceColour = juce::Colours::lime;

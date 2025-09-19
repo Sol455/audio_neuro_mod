@@ -164,7 +164,6 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     modModeCombo.addItem("FM", 2);
     modModeCombo.addItem("ISO", 3);
 
-
     modModeLabel.setText("Mod Mode", juce::dontSendNotification);
     addAndMakeVisible(processingModeLabel);
 

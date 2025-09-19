@@ -40,22 +40,37 @@ void AudioEngine::process(juce::AudioBuffer<float>& buffer, const Parameters& pa
 
     std::vector<float> modValues;
 
-    // Apply modulation
+    // Generate modulation values
     if (params.mode == ModulationMode::OpenLoop)
     {
-        //processOpenLoopModulation(buffer, params);
         modValues = generateOLModulationValues(buffer.getNumSamples(), params);
     }
     else if (params.mode == ModulationMode::ClosedLoop && getModulationValue)
     {
-        //processClosedLoopModulation(buffer, getModulationValue);
         modValues = generateCLModulationValues(buffer.getNumSamples(),getModulationValue);
 
     }
 
-    //processFilterSweep(buffer,params);
-    //processOpenLoopModulation(buffer, params);
-    applyFilterModulation(buffer, modValues);
+    switch (params.modType) {
+        case AudioEngine::ModulationType::AM:
+            //applyFilterModulation(buffer, modValues);
+            //DBG("AM");
+            applyAmplitudeModulation(buffer, modValues);
+            break;
+        case AudioEngine::ModulationType::FM:
+            applyFilterModulation(buffer, modValues);
+            //DBG("FM");
+            break;
+        case AudioEngine::ModulationType::ISO:
+            //DBG("ISO");
+
+            //TO -DP
+            break;
+        default:
+            // Fallback to ISO (both)
+            //applyAmplitudeModulation(buffer, modValues);
+            break;
+    }
 
 }
 
@@ -104,7 +119,6 @@ void AudioEngine::applyAmplitudeModulation(juce::AudioBuffer<float>& buffer, con
         }
     }
 }
-
 // Apply filter modulation
 void AudioEngine::applyFilterModulation(juce::AudioBuffer<float>& buffer, const std::vector<float>& modValues)
 {

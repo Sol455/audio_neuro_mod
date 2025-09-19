@@ -14,7 +14,7 @@ class AudioEngine
 public:
     enum class ModulationMode { OpenLoop, ClosedLoop };
 
-    enum class ModulationType {AM, FilterSweep};
+    enum class ModulationType {AM, FM, ISO};
 
     struct Parameters {
         float carrierFreq = 440.0f;
@@ -25,6 +25,7 @@ public:
         float filterCutoff = 1000.0f;
         float filterQ = 0.707f;
         ModulationMode mode = ModulationMode::ClosedLoop;
+        ModulationType modType = ModulationType::AM;
     };
 
     AudioEngine();

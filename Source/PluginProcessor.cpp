@@ -218,6 +218,32 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     int modeIndex = static_cast<int>(paramsCache.processingMode->load());
     engineParams.mode = (modeIndex == 0) ? AudioEngine::ModulationMode::ClosedLoop: AudioEngine::ModulationMode::OpenLoop;
 
+    if (paramsCache.modMode != nullptr)
+    {
+        int modModeIndex = static_cast<int>(paramsCache.modMode->load());
+
+        switch (modModeIndex)
+        {
+            case 0:
+                engineParams.modType = AudioEngine::ModulationType::AM;
+                break;
+            case 1:
+                engineParams.modType = AudioEngine::ModulationType::FM;
+                break;
+            case 2:
+                engineParams.modType = AudioEngine::ModulationType::ISO;
+                break;
+            default:
+                engineParams.modType = AudioEngine::ModulationType::AM;
+                break;
+        }
+    }
+    else
+    {
+        // Fallback if parameter is null
+        engineParams.modType = AudioEngine::ModulationType::AM;
+    }
+
     auto getEEGModulation = [this, blockStartSample](int64_t sampleOffset) -> float {
         return outputSync.getEegValueAtTime(blockStartSample + sampleOffset);
     };
@@ -284,7 +310,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout AudioPluginAudioProcessor::c
 
     params.push_back(std::make_unique<juce::AudioParameterFloat>(Params::IDs::ModFreq, "Min Depth", juce::NormalisableRange<float>(0.1f, 20.0f, 0.01f), 10.0f));
 
-    params.push_back(std::make_unique<juce::AudioParameterChoice>(Params::IDs::ProcessingMode, "Mod Mode",juce::StringArray{"AM", "FM", "ISO"}, 0));
+    params.push_back(std::make_unique<juce::AudioParameterChoice>(Params::IDs::ModMode, "Mod Mode",juce::StringArray{"AM", "FM", "ISO"}, 0));
 
     return { params.begin(), params.end() };
 

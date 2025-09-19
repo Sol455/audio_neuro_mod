@@ -56,6 +56,8 @@ void DSPWorker::process (const EegSample& sample_in)
 
         // Dest Full, Drop one
     }
+    //FIFO capacity tracking
+    //std::cout << "UI RAW FIFO: " << uiDestRawFIFO.available() << "/" << uiDestRawFIFO.capacity() << " " << (100.0f * uiDestRawFIFO.available() / uiDestRawFIFO.capacity()) << "%)" << std::endl;
 }
 
 
@@ -76,46 +78,46 @@ void DSPWorker::run()
         }
 }
 
-void DSPWorker::run_and_profile()
-{
-    SimpleProfiler processProfiler;
-    auto lastPrintTime = std::chrono::high_resolution_clock::now();
-
-    while (!threadShouldExit())
-    {
-        // Print stats every 100ms
-        auto now = std::chrono::high_resolution_clock::now();
-        auto timeSinceLastPrint = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastPrintTime);
-
-        if (timeSinceLastPrint.count() >= 100) {
-            auto now_c = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-
-            std::cout << "Time: " << std::put_time(std::localtime(&now_c), "%H:%M:%S")
-                      << " | FIFO: " << sourceFIFO.available() << "/" << sourceFIFO.capacity()
-                      << " (" << (100.0f * sourceFIFO.available() / sourceFIFO.capacity()) << "%)"
-                      << " | Process avg: " << std::fixed << std::setprecision(3) << processProfiler.getAverage() << "ms"
-                      << std::endl;
-
-            processProfiler.reset();
-            lastPrintTime = now;
-        }
-
-        EegSample sample;
-        if (sourceFIFO.readSample(sample)) {
-
-            processProfiler.start();
-            process(sample);
-            processProfiler.stop();
-
-            // Warn on slow calls
-            if (processProfiler.getTime() > 10.0) {
-                std::cout << "WARNING: Slow process() call took " << processProfiler.getTime() << "ms" << std::endl;
-            }
-        }
-        else
-        {
-            // No sample ready
-            juce::Thread::yield();
-        }
-    }
-}
+// void DSPWorker::run_and_profile()
+// {
+//     SimpleProfiler processProfiler;
+//     auto lastPrintTime = std::chrono::high_resolution_clock::now();
+//
+//     while (!threadShouldExit())
+//     {
+//         // Print stats every 100ms
+//         auto now = std::chrono::high_resolution_clock::now();
+//         auto timeSinceLastPrint = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastPrintTime);
+//
+//         if (timeSinceLastPrint.count() >= 100) {
+//             auto now_c = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+//
+//             std::cout << "Time: " << std::put_time(std::localtime(&now_c), "%H:%M:%S")
+//                       << " | FIFO: " << sourceFIFO.available() << "/" << sourceFIFO.capacity()
+//                       << " (" << (100.0f * sourceFIFO.available() / sourceFIFO.capacity()) << "%)"
+//                       << " | Process avg: " << std::fixed << std::setprecision(3) << processProfiler.getAverage() << "ms"
+//                       << std::endl;
+//
+//             processProfiler.reset();
+//             lastPrintTime = now;
+//         }
+//
+//         EegSample sample;
+//         if (sourceFIFO.readSample(sample)) {
+//
+//             processProfiler.start();
+//             process(sample);
+//             processProfiler.stop();
+//
+//             // Warn on slow calls
+//             if (processProfiler.getTime() > 10.0) {
+//                 std::cout << "WARNING: Slow process() call took " << processProfiler.getTime() << "ms" << std::endl;
+//             }
+//         }
+//         else
+//         {
+//             // No sample ready
+//             juce::Thread::yield();
+//         }
+//     }
+// }
