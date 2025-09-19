@@ -291,9 +291,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout AudioPluginAudioProcessor::c
 {
     std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
 
-    params.push_back(std::make_unique<juce::AudioParameterFloat>(Params::IDs::Freq
-, "freq",
-    juce::NormalisableRange<float>(0.f, 10000.f, 10.0), 400.0f));
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(Params::IDs::Freq, "freq",juce::NormalisableRange<float>(1.0f, 1000.0f, 1.0f, 0.3f), 200.0f
+    ));
 
     params.push_back(std::make_unique<juce::AudioParameterFloat>(Params::IDs::Gain, "Gain",
     juce::NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.5f));

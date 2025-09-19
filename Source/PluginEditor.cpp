@@ -159,19 +159,20 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
         processingModeCombo
     );
 
+
     addAndMakeVisible(modModeCombo);
-    modModeCombo.addItem("AM", 1);
-    modModeCombo.addItem("FM", 2);
-    modModeCombo.addItem("ISO", 3);
-
     modModeLabel.setText("Mod Mode", juce::dontSendNotification);
-    addAndMakeVisible(processingModeLabel);
 
+    addAndMakeVisible(modModeLabel);
     modModeAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(
         processorRef.apvts,
         Params::IDs::ModMode.getParamID(),
         modModeCombo
     );
+    modModeCombo.addItem("AM", 1);
+    modModeCombo.addItem("FM", 2);
+    modModeCombo.addItem("ISO", 3);
+    modModeCombo.setSelectedId(1);
 
     startTimer(1000);
     setSize (800, 500);
@@ -361,13 +362,14 @@ void AudioPluginAudioProcessorEditor::resized()
     bottomControlsArea.removeFromLeft(slider_space);
     auto freqControlArea = bottomControlsArea.removeFromLeft(60);
     bottomControlsArea.removeFromLeft(slider_space);
-    auto gainControlArea = bottomControlsArea.removeFromLeft(60);
-     bottomControlsArea.removeFromLeft(slider_space);
-    auto modDepthArea = bottomControlsArea.removeFromLeft(60);
-    bottomControlsArea.removeFromLeft(slider_space);
     auto modMinDepthArea = bottomControlsArea.removeFromLeft(60);
     bottomControlsArea.removeFromLeft(slider_space);
+    auto modDepthArea = bottomControlsArea.removeFromLeft(60);
+    bottomControlsArea.removeFromLeft(slider_space);
     auto modFreqArea = bottomControlsArea.removeFromLeft(60);
+    bottomControlsArea.removeFromLeft(slider_space);
+    auto gainControlArea = bottomControlsArea.removeFromLeft(60);
+    bottomControlsArea.removeFromLeft(slider_space);
 
     modModeLabel.setBounds(modModeArea.removeFromTop(25));
     modModeCombo.setBounds(modModeArea.removeFromTop(40));
