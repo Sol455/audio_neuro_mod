@@ -154,7 +154,7 @@ void AudioPluginAudioProcessor::lsl_stream()
     lslWorker.setInlet (lsl_connector.inlet());
     lslWorker.setChannel(0);
     lslWorker.startWorker();
-    dspWorker.prepare(eegSampleRate, 10.0f, 2.0f, paramsCache.modDepth, paramsCache.modMinDepth, paramsCache.envMix);
+    dspWorker.prepare(eegSampleRate, 10.0f, 2.0f, paramsCache.modDepth, paramsCache.modMinDepth, paramsCache.envMix, paramsCache.modMode);
     dspWorker.startWorker();
 
 }
@@ -310,7 +310,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout AudioPluginAudioProcessor::c
 
     params.push_back(std::make_unique<juce::AudioParameterFloat>(Params::IDs::ModDepth, "Depth",juce::NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.7f));
 
-    params.push_back(std::make_unique<juce::AudioParameterFloat>(Params::IDs::ModMinDepth, "Min Depth", juce::NormalisableRange<float>(0.1f, 1.0f, 0.01f), 0.15f));
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(Params::IDs::ModMinDepth, "Min Depth", juce::NormalisableRange<float>(0.01f, 1.0f, 0.01f), 0.15f));
 
     params.push_back(std::make_unique<juce::AudioParameterFloat>(Params::IDs::ModFreq, "Min Depth", juce::NormalisableRange<float>(0.1f, 20.0f, 0.01f), 10.0f));
 

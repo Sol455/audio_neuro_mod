@@ -14,28 +14,23 @@ public:
 
     void prepare (double fs, double centreHz, double Q);
 
-    void setBand (double centreHz, double Q);
-
-    float filter (float input);
-
     std::complex<float> filterComplex (float input);
 
-    float makeModSignalReal(float sample, float percentile);
+    float makeModSignal(float env, float phase, float phase_offset, float percentile);
 
-    float makeModSignalComplex(float env, float phase, float phase_offset, float percentile);
-
-    void setParameterReferences(std::atomic<float>* modDepth, std::atomic<float>* minModDepth, std::atomic<float>* envMix);
-
+    void setParameterReferences(std::atomic<float>* modDepth, std::atomic<float>* minModDepth, std::atomic<float>* envMix, std::atomic<float>* modeMode);
 
 private:
+    //modulation generation
+    float makeSmoothModSignal(float env, float phase, float phase_offset, float percentile);
+    float makeIsochronicModSignal(float env, float phase, float phase_offset, float percentile);
     //parameter refs
     std::atomic<float>* modDepthRef = nullptr;
     std::atomic<float>* minModDepthRef = nullptr;
     std::atomic<float>* envMixRef = nullptr;
-
+    std::atomic<float>* modModeRef = nullptr;
 
     double fs_ = 0.0;
-    juce::dsp::IIR::Filter<float> bp_;
     CFIRFilter cf_;
 
     double envelope_95_ref = 7.688501426439704;

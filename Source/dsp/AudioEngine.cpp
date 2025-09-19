@@ -55,21 +55,17 @@ void AudioEngine::process(juce::AudioBuffer<float>& buffer, const Parameters& pa
     switch (params.modType) {
         case AudioEngine::ModulationType::AM:
             //applyFilterModulation(buffer, modValues);
-            //DBG("AM");
             applyAmplitudeModulation(buffer, modValues);
             break;
         case AudioEngine::ModulationType::FM:
             applyFilterModulation(buffer, modValues);
-            //DBG("FM");
             break;
         case AudioEngine::ModulationType::ISO:
-            //DBG("ISO");
+            applyAmplitudeModulation(buffer, modValues);
 
-            //TO -DP
             break;
         default:
-            // Fallback to ISO (both)
-            //applyAmplitudeModulation(buffer, modValues);
+            applyAmplitudeModulation(buffer, modValues);
             break;
     }
 
@@ -89,17 +85,61 @@ std::vector<float> AudioEngine::generateCLModulationValues(int numSamples, const
     return modValues;
 }
 
+
 std::vector<float> AudioEngine::generateOLModulationValues(int numSamples, const Parameters& params)
 {
-    sineModulator.setFrequency(params.modFreq);
-
     std::vector<float> modValues(numSamples);
 
-    for (int sample = 0; sample < numSamples; ++sample)
-    {
-        float modValue = (sineModulator.processSample(0.0f) + 1.0f) * 0.5f; // 0 to 1
-        float scaledMod = params.modDepth * modValue;
-        modValues[sample] = params.minModDepth + (1.0f - params.minModDepth) * scaledMod;
+    switch (params.modType) {
+        case ModulationType::AM:
+        case ModulationType::FM:
+        {
+            //Smooth sine modulation
+            sineModulator.setFrequency(params.modFreq);
+
+            for (int sample = 0; sample < numSamples; ++sample)
+            {
+                float modValue = (sineModulator.processSample(0.0f) + 1.0f) * 0.5f; // 0 to 1
+                float scaledMod = params.modDepth * modValue;
+                modValues[sample] = params.minModDepth + (1.0f - params.minModDepth) * scaledMod;
+            }
+            break;
+        }
+
+        case ModulationType::ISO:
+        {
+            sineModulator.setFrequency(params.modFreq);
+
+            static float smoothedPulse = 1.0f;
+            const float smoothingFactor = 0.995f;
+
+            for (int sample = 0; sample < numSamples; ++sample)
+            {
+                float sineValue = sineModulator.processSample(0.0f);
+
+                // Simple 50% Duty Cycle
+                float rawPulse = (sineValue > 0.0f) ? 1.0f : 0.0f;
+
+                // Smoothhing
+                smoothedPulse = smoothingFactor * smoothedPulse + (1.0f - smoothingFactor) * rawPulse;
+
+                float scaledPulse = params.modDepth * smoothedPulse;
+                modValues[sample] = params.minModDepth + (1.0f - params.minModDepth) * scaledPulse;
+            }
+            break;
+        }
+
+        default:
+            //Default to AM
+            sineModulator.setFrequency(params.modFreq);
+
+            for (int sample = 0; sample < numSamples; ++sample)
+            {
+                float modValue = (sineModulator.processSample(0.0f) + 1.0f) * 0.5f;
+                float scaledMod = params.modDepth * modValue;
+                modValues[sample] = params.minModDepth + (1.0f - params.minModDepth) * scaledMod;
+            }
+            break;
     }
 
     return modValues;
