@@ -154,7 +154,7 @@ void AudioPluginAudioProcessor::lsl_stream()
     lslWorker.setInlet (lsl_connector.inlet());
     lslWorker.setChannel(0);
     lslWorker.startWorker();
-    dspWorker.prepare(eegSampleRate, 10.0f, 2.0f, paramsCache.modDepth, paramsCache.modMinDepth);
+    dspWorker.prepare(eegSampleRate, 10.0f, 2.0f, paramsCache.modDepth, paramsCache.modMinDepth, paramsCache.envMix);
     dspWorker.startWorker();
 
 }
@@ -310,6 +310,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout AudioPluginAudioProcessor::c
     params.push_back(std::make_unique<juce::AudioParameterFloat>(Params::IDs::ModFreq, "Min Depth", juce::NormalisableRange<float>(0.1f, 20.0f, 0.01f), 10.0f));
 
     params.push_back(std::make_unique<juce::AudioParameterChoice>(Params::IDs::ModMode, "Mod Mode",juce::StringArray{"AM", "FM", "ISO"}, 0));
+
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(Params::IDs::EnvMix, "Env Mix",juce::NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.5f));
 
     return { params.begin(), params.end() };
 

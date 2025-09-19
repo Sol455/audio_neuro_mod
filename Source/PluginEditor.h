@@ -24,9 +24,9 @@ private:
     EegScopeComponent phaseScope;
     EegScopeComponent modulationScope;
 
-    juce::Slider freqSlider, gainSlider, phaseSlider, modDepthSlider, modMinDepthSlider, modFreqSlider;
+    juce::Slider freqSlider, gainSlider, phaseSlider, modDepthSlider, modMinDepthSlider, modFreqSlider, envMixSlider;
     using SliderAttachment = juce::AudioProcessorValueTreeState::SliderAttachment;
-    std::unique_ptr<SliderAttachment> freqSliderAttachment, gainSliderAttachment, phaseSliderAttachment, modDepthSliderAttachment, modMinDepthSliderAttachment, modFreqSliderAttachment;
+    std::unique_ptr<SliderAttachment> freqSliderAttachment, gainSliderAttachment, phaseSliderAttachment, modDepthSliderAttachment, modMinDepthSliderAttachment, modFreqSliderAttachment, envMixSliderAttachment;
 
     juce::Label freqLabel {"freqLabel", "Carrier Freq"};
     juce::Label gainLabel {"gainLabel", "Gain"};
@@ -34,6 +34,7 @@ private:
     juce::Label modDepthLabel {"moddepthlabel", "Mod Depth"};
     juce::Label minModDepthLabel {"minmoddepthlabel", "Min Mod Depth"};
     juce::Label modFreqLabel {"modfreqlabel", "Mod Freq"};
+    juce::Label envMixLabel {"envmixlabel", "Env Mix Label"};
 
     juce::Label systemDelayLabel, desiredPhaseLabel, brainFreqLabel;
     juce::TextEditor systemDelayInput;

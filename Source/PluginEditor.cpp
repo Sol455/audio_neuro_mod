@@ -12,6 +12,8 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     addAndMakeVisible(modDepthSlider);
     addAndMakeVisible(modMinDepthSlider);
     addAndMakeVisible(modFreqSlider);
+    addAndMakeVisible(envMixSlider);
+
 
     freqSlider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
     gainSlider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
@@ -19,6 +21,7 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     modDepthSlider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
     modMinDepthSlider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
     modFreqSlider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
+    envMixSlider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
 
     freqSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 50, 13);
     gainSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 50, 13);
@@ -26,6 +29,7 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     modDepthSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 50, 13);
     modMinDepthSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 50, 13);
     modFreqSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 50, 13);
+    envMixSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 50, 13);
 
     gainSliderAttachment  = std::make_unique<SliderAttachment>(processorRef.apvts, Params::IDs::Gain.getParamID()
 , gainSlider);
@@ -39,6 +43,8 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
 , modMinDepthSlider);
     modFreqSliderAttachment = std::make_unique<SliderAttachment>(processorRef.apvts, Params::IDs::ModFreq.getParamID()
 , modFreqSlider);
+    envMixSliderAttachment = std::make_unique<SliderAttachment>(processorRef.apvts, Params::IDs::EnvMix.getParamID()
+, envMixSlider);
 
     freqLabel.setJustificationType(juce::Justification::centred);
     addAndMakeVisible(freqLabel);
@@ -54,6 +60,8 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     addAndMakeVisible(modFreqLabel);
     modModeLabel.setJustificationType(juce::Justification::centred);
     addAndMakeVisible(modModeLabel);
+    envMixLabel.setJustificationType(juce::Justification::centred);
+    addAndMakeVisible(envMixLabel);
 
     addAndMakeVisible(connectButton);
     connectButton.setButtonText("Connect");
@@ -362,6 +370,8 @@ void AudioPluginAudioProcessorEditor::resized()
     bottomControlsArea.removeFromLeft(slider_space);
     auto freqControlArea = bottomControlsArea.removeFromLeft(60);
     bottomControlsArea.removeFromLeft(slider_space);
+    auto envMixArea = bottomControlsArea.removeFromLeft(60);
+    bottomControlsArea.removeFromLeft(slider_space);
     auto modMinDepthArea = bottomControlsArea.removeFromLeft(60);
     bottomControlsArea.removeFromLeft(slider_space);
     auto modDepthArea = bottomControlsArea.removeFromLeft(60);
@@ -391,6 +401,9 @@ void AudioPluginAudioProcessorEditor::resized()
 
     modFreqLabel.setBounds(modFreqArea.removeFromTop(25));
     modFreqSlider.setBounds(modFreqArea);
+
+    envMixLabel.setBounds(envMixArea.removeFromTop(25));
+    envMixSlider.setBounds(envMixArea);
 
 }
 

@@ -19,6 +19,8 @@ namespace Params
         inline const juce::ParameterID ModMinDepth { "MOD_MIN_DEPTH", 1 };
         inline const juce::ParameterID ModFreq { "MOD_FREQ", 1 };
         inline const juce::ParameterID ModMode { "MOD_MODE", 1 };
+        inline const juce::ParameterID EnvMix { "ENV_MIX", 1 };
+
 
 
     }
@@ -58,6 +60,7 @@ namespace Params
         std::atomic<float>* modMinDepth = nullptr;
         std::atomic<float>* modFreq = nullptr;
         std::atomic<float>* modMode = nullptr;
+        std::atomic<float>* envMix = nullptr;
 
         juce::AudioParameterFloat* freqParam = nullptr;
         juce::AudioParameterFloat* gainParam = nullptr;
@@ -68,8 +71,7 @@ namespace Params
         juce::AudioParameterFloat* modMinDepthParam = nullptr;
         juce::AudioParameterFloat* modFreqParam = nullptr;
         juce::AudioParameterChoice* modModeParam = nullptr;
-
-
+        juce::AudioParameterFloat* envMixParam = nullptr;
 
         void init (juce::AudioProcessorValueTreeState& apvts)
         {
@@ -81,6 +83,7 @@ namespace Params
             modMinDepth = raw (apvts, IDs::ModMinDepth);
             modFreq = raw (apvts, IDs::ModFreq);
             modMode = raw (apvts, IDs::ModMode);
+            envMix = raw (apvts, IDs::EnvMix);
 
             freqParam = as<juce::AudioParameterFloat> (param (apvts, IDs::Freq));
             gainParam = as<juce::AudioParameterFloat> (param (apvts, IDs::Gain));
@@ -90,6 +93,7 @@ namespace Params
             modMinDepthParam = as<juce::AudioParameterFloat> (param (apvts, IDs::ModMinDepth));
             modFreqParam =  as<juce::AudioParameterFloat> (param (apvts, IDs::ModFreq));
             modModeParam = as<juce::AudioParameterChoice> (param (apvts, IDs::ModMode));
+            envMixParam = as<juce::AudioParameterFloat> (param (apvts, IDs::EnvMix));
 
         }
     };

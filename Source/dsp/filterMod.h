@@ -7,7 +7,6 @@
 
 #include <juce_dsp/juce_dsp.h>
 #include "CFIRFilter.h"
-#include "RunningPercentile.h"
 
 class filterMod
 {
@@ -21,25 +20,26 @@ public:
 
     std::complex<float> filterComplex (float input);
 
-    float makeModSignalReal(float sample, RunningPercentile& percentile);
+    float makeModSignalReal(float sample, float percentile);
 
-    float makeModSignalComplex(float env, float phase, float phase_offset, RunningPercentile& percentile);
+    float makeModSignalComplex(float env, float phase, float phase_offset, float percentile);
 
-    void setParameterReferences(std::atomic<float>* modDepth, std::atomic<float>* minModDepth);
+    void setParameterReferences(std::atomic<float>* modDepth, std::atomic<float>* minModDepth, std::atomic<float>* envMix);
 
 
 private:
     //parameter refs
     std::atomic<float>* modDepthRef = nullptr;
     std::atomic<float>* minModDepthRef = nullptr;
+    std::atomic<float>* envMixRef = nullptr;
+
 
     double fs_ = 0.0;
     juce::dsp::IIR::Filter<float> bp_;
     CFIRFilter cf_;
 
     double envelope_95_ref = 7.688501426439704;
-    // double mod_depth = 0.9f;
-    // double mod_min_depth = 0.15f;
+
 };
 
 #endif //AUDIO_NEURO_MOD_FILTER_H

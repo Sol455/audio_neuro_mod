@@ -14,10 +14,11 @@ void filterMod::prepare (double fs, double centreHz, double Q)
     cf_.prepare(8.0, 12.0, fs, 50, 500, 2000);
 }
 
-void filterMod::setParameterReferences(std::atomic<float>* modDepth, std::atomic<float>* minModDepth)
+void filterMod::setParameterReferences(std::atomic<float>* modDepth, std::atomic<float>* minModDepth, std::atomic<float>* envMix)
 {
     modDepthRef = modDepth;
     minModDepthRef = minModDepth;
+    envMixRef = envMix;
 }
 
 float filterMod::filter (float input) {
@@ -26,7 +27,7 @@ float filterMod::filter (float input) {
     return bp_.processSample (input);
 }
 
-float filterMod::makeModSignalReal(float sample, RunningPercentile& percentile)
+float filterMod::makeModSignalReal(float sample, float percentile)
 {
 
     //DBG ("Sample in: " << sample);
@@ -34,9 +35,9 @@ float filterMod::makeModSignalReal(float sample, RunningPercentile& percentile)
     float min_mod_depth = minModDepthRef ? minModDepthRef->load() : 0.1f;
 
     //normalise raw sample
-    float ref95 = percentile.getPercentile(0.95f); // 7.688501426439704e-05; envelope_95_ref; //
+    //  percetile = 7.688501426439704e-05;
 
-    float depth = 0.5f * ((sample / ref95) + 1.0f);
+    float depth = 0.5f * ((sample / percentile) + 1.0f);
 
     //scale by modulation depth
     depth *= mod_depth;
@@ -52,20 +53,22 @@ float filterMod::makeModSignalReal(float sample, RunningPercentile& percentile)
 }
 
 std::complex<float> filterMod::filterComplex (float input) {
-
     std::complex<float> analyticSignal = cf_.processSample(input);
     return analyticSignal;;
 }
 
-float filterMod::makeModSignalComplex(float env, float phase, float phase_offset, RunningPercentile& percentile)
+float filterMod::makeModSignalComplex(float env, float phase, float phase_offset, float percentile)
 {
-    float envelope_95_percentile = percentile.getPercentile(0.95f);
     float mod_depth = modDepthRef ? modDepthRef->load() : 0.5f;
     float min_mod_depth = minModDepthRef ? minModDepthRef->load() : 0.1f;
+    float env_mix = envMixRef ? envMixRef->load() : 0.5f;
 
-    //depth
-    float depth = (env / envelope_95_percentile) * mod_depth;
+    float env_factor = env / percentile; //scale modulation relative to running percentile
 
+    // env_mix controls i.e. how much this envelope factor affects the modulation depth
+    // At env_mix = 0: depth = mod_depth (constant), just relies on phase
+    // At env_mix = 1: depth = env_factor * mod_depth (full envelope influence)
+    float depth = mod_depth * (1.0f + (env_factor - 1.0f) * env_mix);
     //clip
     depth = juce::jlimit(0.0f, 1.0f, depth);
 

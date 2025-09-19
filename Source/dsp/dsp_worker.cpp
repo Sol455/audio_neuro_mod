@@ -10,14 +10,13 @@
 #define M_PI 3.14159265358979323846
 #endif
 
-void DSPWorker::prepare(double eegFs, double centreHz, double Q, std::atomic<float>* modDepth, std::atomic<float>* minModDepth) {
+void DSPWorker::prepare(double eegFs, double centreHz, double Q, std::atomic<float>* modDepth, std::atomic<float>* minModDepth, std::atomic<float>* envMix) {
     filtermod.prepare(eegFs, centreHz, Q);
-    filtermod.setParameterReferences(modDepth, minModDepth);
+    filtermod.setParameterReferences(modDepth, minModDepth, envMix);
 }
 
 void DSPWorker::process (const EegSample& sample_in)
 {
-
     percentile.addSample(sample_in.value);
 
     //COMPLEX processing
@@ -28,12 +27,11 @@ void DSPWorker::process (const EegSample& sample_in)
     float phaseOffsetDegrees = paramsCache.phaseOffset->load();
     float phaseOffsetRadians = phaseOffsetDegrees * (M_PI / 180.0f);
 
-    const float mod_signal = filtermod.makeModSignalComplex(envelope, phase, phaseOffsetRadians, percentile);
-
+    float percentile_95 = percentile.getPercentile(0.95f);
+    const float mod_signal = filtermod.makeModSignalComplex(envelope, phase, phaseOffsetRadians, percentile_95);
 
     const EegSample mod_out { mod_signal, sample_in.stamp };
     const EegSample phase_out { phase, sample_in.stamp };
-
 
     //Write to output ring Buffer
     destRING.addSample(mod_out);
