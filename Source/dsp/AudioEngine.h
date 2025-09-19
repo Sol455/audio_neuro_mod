@@ -26,6 +26,7 @@ public:
         float filterQ = 0.707f;
         ModulationMode mode = ModulationMode::ClosedLoop;
         ModulationType modType = ModulationType::AM;
+        Carrier::WaveformType waveformType = Carrier::WaveformType::Sine;
     };
 
     AudioEngine();

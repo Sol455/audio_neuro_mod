@@ -36,6 +36,7 @@ void AudioEngine::process(juce::AudioBuffer<float>& buffer, const Parameters& pa
     // Generate carrier
     carrier.setFrequency(params.carrierFreq);
     carrier.setAmplitude(params.carrierGain);
+    carrier.setWaveform(params.waveformType);
     carrier.process(buffer);
 
     std::vector<float> modValues;

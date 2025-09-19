@@ -153,7 +153,6 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     updateChannelSelector();
 
     //Processing mode selection:
-
     addAndMakeVisible(processingModeCombo);
     processingModeCombo.addItem("Closed Loop", 1);
     processingModeCombo.addItem("Open Loop", 2);
@@ -181,6 +180,22 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     modModeCombo.addItem("FM", 2);
     modModeCombo.addItem("ISO", 3);
     modModeCombo.setSelectedId(1);
+
+    //Waveform Type Combo
+    addAndMakeVisible(waveformTypeCombo);
+    waveformTypeLabel.setText("Wave Type", juce::dontSendNotification);
+    addAndMakeVisible(waveformTypeLabel);
+
+    waveformTypeAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(
+        processorRef.apvts,
+        Params::IDs::WaveformType.getParamID(),
+        waveformTypeCombo
+    );
+    waveformTypeCombo.addItem("Sine", 1);
+    waveformTypeCombo.addItem("Square", 2);
+    waveformTypeCombo.addItem("Saw", 3);
+    waveformTypeCombo.addItem("Triangle", 4);
+    waveformTypeCombo.setSelectedId(1);
 
     startTimer(1000);
     setSize (800, 500);
@@ -366,7 +381,7 @@ void AudioPluginAudioProcessorEditor::resized()
 
     auto slider_space = 15;
     bottomControlsArea.removeFromLeft(slider_space);
-    auto modModeArea = bottomControlsArea.removeFromLeft(60);
+    auto comboArea = bottomControlsArea.removeFromLeft(60);
     bottomControlsArea.removeFromLeft(slider_space);
     auto freqControlArea = bottomControlsArea.removeFromLeft(60);
     bottomControlsArea.removeFromLeft(slider_space);
@@ -381,8 +396,12 @@ void AudioPluginAudioProcessorEditor::resized()
     auto gainControlArea = bottomControlsArea.removeFromLeft(60);
     bottomControlsArea.removeFromLeft(slider_space);
 
+    auto modModeArea = comboArea.removeFromTop(comboArea.getHeight() / 2);
     modModeLabel.setBounds(modModeArea.removeFromTop(25));
     modModeCombo.setBounds(modModeArea.removeFromTop(40));
+
+    waveformTypeLabel.setBounds(comboArea.removeFromTop(25));
+    waveformTypeCombo.setBounds(comboArea.removeFromTop(40));
 
     // Frequency controls
     freqLabel.setBounds(freqControlArea.removeFromTop(25));

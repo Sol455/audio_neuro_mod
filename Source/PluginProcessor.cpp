@@ -215,6 +215,11 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     engineParams.minModDepth = paramsCache.modMinDepth->load();
     engineParams.modFreq = paramsCache.modFreq->load();
 
+    //Set waveform type
+    int waveformIndex = static_cast<int>(paramsCache.waveformType->load());
+    Carrier::WaveformType waveformType = static_cast<Carrier::WaveformType>(waveformIndex);
+    engineParams.waveformType = waveformType;
+
     int modeIndex = static_cast<int>(paramsCache.processingMode->load());
     engineParams.mode = (modeIndex == 0) ? AudioEngine::ModulationMode::ClosedLoop: AudioEngine::ModulationMode::OpenLoop;
 
@@ -312,6 +317,9 @@ juce::AudioProcessorValueTreeState::ParameterLayout AudioPluginAudioProcessor::c
     params.push_back(std::make_unique<juce::AudioParameterChoice>(Params::IDs::ModMode, "Mod Mode",juce::StringArray{"AM", "FM", "ISO"}, 0));
 
     params.push_back(std::make_unique<juce::AudioParameterFloat>(Params::IDs::EnvMix, "Env Mix",juce::NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.5f));
+
+    params.push_back(std::make_unique<juce::AudioParameterChoice>(Params::IDs::WaveformType, "Waveform Type",juce::StringArray{"Sine", "Square", "Saw", "Triangle"}, 0));
+
 
     return { params.begin(), params.end() };
 

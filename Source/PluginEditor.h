@@ -53,6 +53,11 @@ private:
     juce::Label modModeLabel;
     std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> modModeAttachment;
 
+    //waveform type
+    juce::ComboBox waveformTypeCombo;
+    juce::Label waveformTypeLabel;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> waveformTypeAttachment;
+
     void calculatePhaseOffset();
 
     juce::TextButton connectButton, streamButton;
