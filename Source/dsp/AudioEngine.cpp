@@ -142,6 +142,16 @@ std::vector<float> AudioEngine::generateOLModulationValues(int numSamples, const
             break;
     }
 
+
+    //UI Outlet
+    if (onModulationGenerated && !modValues.empty()) {
+        const int sampleStep = 256; // Send every 16th sample from the buffer
+
+        for (int i = 0; i < numSamples; i += sampleStep) {
+            onModulationGenerated(modValues[i]);
+        }
+    }
+
     return modValues;
 }
 

@@ -71,6 +71,8 @@ public:
     EegFIFO& getUiRawRing() { return uiRawOutletFIFO; }
     EegFIFO& getUiPhaseRing() { return uiPhaseOutletFIFO; }
     EegFIFO& getUiModRing() { return uiModOutletFIFO; }
+    EegFIFO& getUiOpenLoopModRing() { return uiOpenLoopModFIFO; }
+
 
 private:
 
@@ -88,6 +90,7 @@ private:
     EegFIFO uiRawOutletFIFO { 1024};
     EegFIFO uiPhaseOutletFIFO { 1024 };
     EegFIFO uiModOutletFIFO { 1024};
+    EegFIFO uiOpenLoopModFIFO { 1024};
 
     //Output and sync layers
     OutputSyncLayer outputSync;

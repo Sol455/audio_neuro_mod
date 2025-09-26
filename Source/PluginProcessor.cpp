@@ -120,6 +120,14 @@ void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
     stampMapper.prepare(sampleRate);
 
     //output sync layer (jitter control)
+    audioEngine.setModulationCallback([this](float modValue) {
+        auto currentTime = static_cast<int64_t>(juce::Time::getMillisecondCounterHiRes());
+        EegSample fakeSample{modValue, currentTime};
+
+    if (!uiOpenLoopModFIFO.addSample(fakeSample)) {
+        // FIFO full
+    }
+});
 
 
     startTimer(500);

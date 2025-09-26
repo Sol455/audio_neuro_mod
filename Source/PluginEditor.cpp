@@ -129,7 +129,12 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
 
     addAndMakeVisible (modulationScope);
     modulationScope.setAutoscale (true);
-    modulationScope.setSource (&processorRef.getUiModRing(), 160.0); //init with default value
+    modulationScope.setDualSource(
+    &processorRef.getUiModRing(),
+    &processorRef.getUiOpenLoopModRing(),
+    160.0,
+    true
+);//modulationScope.setSource (&processorRef.getUiOpenLoopModRing(), 160.0); //init with default value
     modulationScope.setTraceColour(juce::Colours::coral);
 
     processorRef.setOnSampleRateDetected([this](float sampleRate)
@@ -165,6 +170,11 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
         Params::IDs::ProcessingMode.getParamID(),
         processingModeCombo
     );
+
+    processingModeCombo.onChange = [this]() {
+        bool isClosedLoop = (processingModeCombo.getSelectedId() == 1); // 1 = Closed Loop
+        modulationScope.setActiveSource(isClosedLoop);
+    };
 
 
     addAndMakeVisible(modModeCombo);

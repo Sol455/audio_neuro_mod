@@ -34,11 +34,15 @@ public:
     void prepare(double sampleRate, int samplesPerBlock, int numOutputChannels);
     void process(juce::AudioBuffer<float>& buffer, const Parameters& params,
                 const std::function<float(int64_t)>& getModulationValue = nullptr);
+    void setModulationCallback(std::function<void(float)> callback) {
+        onModulationGenerated = callback;
+    }
 
 private:
     Carrier carrier;
     juce::dsp::Oscillator<float> sineModulator;
     juce::dsp::StateVariableTPTFilter<float> lowPassFilter;
+    std::function<void(float)> onModulationGenerated;
 
 
     std::vector<float> generateOLModulationValues(int numSamples, const Parameters& params);

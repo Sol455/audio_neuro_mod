@@ -26,9 +26,31 @@ public:
         circularBuffer.resize(bufferSize, 0.0f);
         writeIndex = 0;
 
-        // Read rate: ~ produced per frame
+        // Read rate:
         const int targetFps = 30;
         startTimerHz(targetFps);
+    }
+
+    void setDualSource(EegFIFO* primary, EegFIFO* secondary, double fsHz, bool usePrimary = true)
+    {
+        ring = primary;
+        secondaryRing = secondary;
+        fs = fsHz;
+        showPrimary = usePrimary;
+
+        // Fixed window (same logic as setSource)
+        windowSeconds = 2.0f;
+        const int bufferSize = (int)(fs * windowSeconds);
+        circularBuffer.resize(bufferSize, 0.0f);
+        writeIndex = 0;
+
+        const int targetFps = 30;
+        startTimerHz(targetFps);
+    }
+
+    void setActiveSource(bool usePrimary)
+    {
+        showPrimary = usePrimary;
     }
 
     void setAutoscale (bool enabled) { autoscale = enabled; }
@@ -85,36 +107,55 @@ private:
         if (ring == nullptr || circularBuffer.empty())
             return;
 
-        // Drain everything
-        const int available = ring->available();
+        // Always drain primary FIFO
+        drainFIFO(ring, showPrimary);
+
+        // drain secondary FIFO if it exists
+        if (secondaryRing != nullptr) {
+            drainFIFO(secondaryRing, !showPrimary);
+        }
+    }
+
+    void drainFIFO(EegFIFO* fifo, bool processData)
+    {
+        const int available = fifo->available();
         if (available == 0)
             return;
 
-        auto rv = ring->beginRead(available);
+        auto rv = fifo->beginRead(available);
         const int n = rv.total();
 
         if (n > 0)
         {
-            const int bufferSize = (int)circularBuffer.size();
-
-            for (int i = 0; i < rv.n1; ++i)
+            if (processData)
             {
-                circularBuffer[writeIndex] = rv.p1[i].value;
-                writeIndex = (writeIndex + 1) % bufferSize;
+                const int bufferSize = (int)circularBuffer.size();
+
+                for (int i = 0; i < rv.n1; ++i)
+                {
+                    circularBuffer[writeIndex] = rv.p1[i].value;
+                    writeIndex = (writeIndex + 1) % bufferSize;
+                }
+
+                for (int i = 0; i < rv.n2; ++i)
+                {
+                    circularBuffer[writeIndex] = rv.p2[i].value;
+                    writeIndex = (writeIndex + 1) % bufferSize;
+                }
             }
 
-            for (int i = 0; i < rv.n2; ++i)
-            {
-                circularBuffer[writeIndex] = rv.p2[i].value;
-                writeIndex = (writeIndex + 1) % bufferSize;
-            }
+            fifo->finishRead(n);  // Always consume
 
-            ring->finishRead(n);
-            repaint();
+            if (processData)
+            {
+                repaint();
+            }
         }
     }
 
     EegFIFO* ring = nullptr;
+    EegFIFO* secondaryRing = nullptr;
+    bool showPrimary = true;
     double fs = 0.0;
     float windowSeconds = 2.0f;
     bool autoscale = true;
