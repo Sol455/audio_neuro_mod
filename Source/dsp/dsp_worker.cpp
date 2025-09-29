@@ -18,7 +18,10 @@ void DSPWorker::process (const EegSample& sample_in)
     percentile.addSample(sample_in.value);
 
     //COMPLEX processing
-    std::complex<float> analytic = filtermod.filterComplex(sample_in.value);
+    float input_sample = sample_in.value;
+    float bias_removed_sample = filtermod.processDCBlock(input_sample);  // Remove DC bias
+
+    std::complex<float> analytic = filtermod.filterComplex(bias_removed_sample);
     float envelope = std::abs(analytic);
     float phase = std::arg(analytic);
 

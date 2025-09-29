@@ -8,6 +8,10 @@ void filterMod::prepare (double fs, double centreHz, double Q)
 {
     fs_ = fs;
     cf_.prepare(8.0, 12.0, fs, 50, 500, 2000); // prepare complex filter
+
+    auto coeffs = juce::dsp::IIR::Coefficients<float>::makeFirstOrderHighPass(fs, 0.5f); //prepare DC removing filter
+    dcBlocker.coefficients = coeffs;
+    dcBlocker.reset();
 }
 
 void filterMod::setParameterReferences(std::atomic<float>* modDepth, std::atomic<float>* minModDepth, std::atomic<float>* envMix, std::atomic<float>* modeMode)
@@ -21,6 +25,14 @@ void filterMod::setParameterReferences(std::atomic<float>* modDepth, std::atomic
 std::complex<float> filterMod::filterComplex (float input) {
     std::complex<float> analyticSignal = cf_.processSample(input);
     return analyticSignal;;
+}
+
+float filterMod::processDCBlock(float input)
+{
+    if (!dcBlockingEnabled)
+        return input;
+
+    return dcBlocker.processSample(input);
 }
 
 float filterMod::makeModSignal(float env, float phase, float phase_offset, float percentile)
