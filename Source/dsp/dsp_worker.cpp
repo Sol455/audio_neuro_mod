@@ -20,6 +20,8 @@ void DSPWorker::process (const EegSample& sample_in)
     //COMPLEX processing
     float input_sample = sample_in.value;
     float bias_removed_sample = filtermod.processDCBlock(input_sample);  // Remove DC bias
+    const EegSample dc_removed_out { bias_removed_sample, sample_in.stamp };
+
 
     std::complex<float> analytic = filtermod.filterComplex(bias_removed_sample);
     float envelope = std::abs(analytic);
@@ -38,7 +40,7 @@ void DSPWorker::process (const EegSample& sample_in)
     destRING.addSample(mod_out);
 
     //Write out samples to the UI OUTLETs
-    if (!uiDestRawFIFO.addSample(sample_in)) {
+    if (!uiDestRawFIFO.addSample(dc_removed_out)) {
         std::cout << "UI Raw FIFO full" << std::endl;
 
         // Dest Full, Drop one
