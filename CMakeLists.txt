@@ -114,3 +114,19 @@ target_link_libraries(${PROJECT_NAME}
         lsl
 )
 
+if (WIN32)
+    # Copy lsl.dll to the main plugin output folder
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_FILE:lsl>
+            $<TARGET_FILE_DIR:${PROJECT_NAME}>
+    )
+
+    # Copy lsl.dll to the Standalone plugin output folder
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_FILE:lsl>
+            $<TARGET_FILE_DIR:${PROJECT_NAME}>/Standalone
+    )
+endif()
+
