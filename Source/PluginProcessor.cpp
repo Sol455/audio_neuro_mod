@@ -107,7 +107,7 @@ void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 
     juce::ignoreUnused (sampleRate, samplesPerBlock);
     outputSync.prepare(sampleRate);
-    outputSync.setDelayMs(20.0f);
+    outputSync.setDelayMs(40.0f);
     outputSync.attachRing(&dspRingBuffer);
 
     audioEngine.prepare(sampleRate, samplesPerBlock, getTotalNumOutputChannels());
