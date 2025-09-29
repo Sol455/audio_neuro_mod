@@ -6,9 +6,7 @@
 
 #include <chrono>
 
-#ifndef M_PI
-#define M_PI 3.14159265358979323846
-#endif
+
 
 void DSPWorker::prepare(double eegFs, double centreHz, double Q, std::atomic<float>* modDepth, std::atomic<float>* minModDepth, std::atomic<float>* envMix, std::atomic<float>* modMode) {
     filtermod.prepare(eegFs, centreHz, Q);
