@@ -15,13 +15,13 @@ void DSPWorker::prepare(double eegFs, double centreHz, double Q, std::atomic<flo
 
 void DSPWorker::process (const EegSample& sample_in)
 {
-    percentile.addSample(sample_in.value);
 
     //COMPLEX processing
     float input_sample = sample_in.value;
     float bias_removed_sample = filtermod.processDCBlock(input_sample);  // Remove DC bias
     const EegSample dc_removed_out { bias_removed_sample, sample_in.stamp };
 
+    percentile.addSample(bias_removed_sample);
 
     std::complex<float> analytic = filtermod.filterComplex(bias_removed_sample);
     float envelope = std::abs(analytic);
