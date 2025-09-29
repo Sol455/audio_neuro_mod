@@ -38,7 +38,6 @@ float filterMod::processDCBlock(float input)
 float filterMod::makeModSignal(float env, float phase, float phase_offset, float percentile)
 {
     int modModeIndex = modModeRef ? static_cast<int>(modModeRef->load()) : 0;
-    std::cout <<modModeIndex << std::endl;
 
     switch (modModeIndex) {
         case 0: // AM
