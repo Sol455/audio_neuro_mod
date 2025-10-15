@@ -12,6 +12,7 @@
 #include "dsp/dsp_worker.h"
 #include "MidiOutputLayer.h"
 #include "OutputSyncLayer.h"
+#include "macros.h"
 
 //==============================================================================
 class AudioPluginAudioProcessor final : public juce::AudioProcessor,  private juce::Timer

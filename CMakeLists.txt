@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
 
-# Change to your project name
 project(audio_neuro_mod VERSION 0.1.0)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -11,8 +10,7 @@ add_subdirectory(external/JUCE)
 
 include(FetchContent)
 
-
-#add_subdirectory(external/liblsl)
+#Import Lab Streaming Layer
 FetchContent_Declare(
         liblsl
         GIT_REPOSITORY https://github.com/sccn/liblsl.git
@@ -23,7 +21,6 @@ FetchContent_MakeAvailable(liblsl)
 
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Source)
 
-# Make sure you include any new source files here
 set(SourceFiles
         ${SRC_DIR}/PluginEditor.cpp
         ${SRC_DIR}/PluginEditor.h
@@ -34,6 +31,7 @@ set(SourceFiles
         ${SRC_DIR}/MidiOutputLayer.cpp
         ${SRC_DIR}/OutputSyncLayer.h
         ${SRC_DIR}/OutputSyncLayer.cpp
+        ${SRC_DIR}/macros.h
 
         #LSL
         ${SRC_DIR}/lsl/eegTypes.h
@@ -63,7 +61,6 @@ set(SourceFiles
 
 )
 
-# Change these to your own preferences
 juce_add_plugin(${PROJECT_NAME}
         COMPANY_NAME sol
         BUNDLE_ID com.solharter.audio_neuro_mod
