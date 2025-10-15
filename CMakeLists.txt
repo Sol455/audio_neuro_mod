@@ -129,4 +129,3 @@ if (WIN32)
             $<TARGET_FILE_DIR:${PROJECT_NAME}>/Standalone
     )
 endif()
-

@@ -24,6 +24,10 @@ public:
 
     void setParameterReferences(std::atomic<float>* modDepth, std::atomic<float>* minModDepth, std::atomic<float>* envMix, std::atomic<float>* modeMode);
 
+    void setDCBlockingEnabled(bool enabled) { dcBlockingEnabled = enabled; }
+
+    float processDCBlock(float input);
+
 private:
     //modulation generation
     float makeSmoothModSignal(float env, float phase, float phase_offset, float percentile);
@@ -36,6 +40,9 @@ private:
 
     double fs_ = 0.0;
     CFIRFilter cf_;
+
+    juce::dsp::IIR::Filter<float> dcBlocker;
+    bool dcBlockingEnabled = true;
 
     double envelope_95_ref = 7.688501426439704;
 

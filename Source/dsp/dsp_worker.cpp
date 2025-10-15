@@ -15,10 +15,15 @@ void DSPWorker::prepare(double eegFs, double centreHz, double Q, std::atomic<flo
 
 void DSPWorker::process (const EegSample& sample_in)
 {
-    percentile.addSample(sample_in.value);
 
     //COMPLEX processing
-    std::complex<float> analytic = filtermod.filterComplex(sample_in.value);
+    float input_sample = sample_in.value;
+    float bias_removed_sample = filtermod.processDCBlock(input_sample);  // Remove DC bias
+    const EegSample dc_removed_out { bias_removed_sample, sample_in.stamp };
+
+    percentile.addSample(bias_removed_sample);
+
+    std::complex<float> analytic = filtermod.filterComplex(bias_removed_sample);
     float envelope = std::abs(analytic);
     float phase = std::arg(analytic);
 
@@ -35,7 +40,7 @@ void DSPWorker::process (const EegSample& sample_in)
     destRING.addSample(mod_out);
 
     //Write out samples to the UI OUTLETs
-    if (!uiDestRawFIFO.addSample(sample_in)) {
+    if (!uiDestRawFIFO.addSample(dc_removed_out)) {
         std::cout << "UI Raw FIFO full" << std::endl;
 
         // Dest Full, Drop one
