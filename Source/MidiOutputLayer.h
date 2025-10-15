@@ -9,6 +9,7 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 #include "lsl/EegRingBuf.h"
 #include "OutputSyncLayer.h"
+#include "macros.h"
 
 class MidiOutputLayer
 {
@@ -24,11 +25,9 @@ private:
 
     int scaleEegToMidi(float eegValue) const;
     OutputSyncLayer* sync = nullptr;
-    int chan = 1, cc = 74;
+    int chan = MIDI_OUTPUT_CHANNEL, cc = MIDI_OUTPUT_CC;
     double rateHz = 50.0, sampleRate = 44000.0;
     int samplesPerCc = 960;
-    int iacChannel = 1;         // 1..16
-    int iacCc      = 74;        // CC number to map
     int64_t nextCcSample = 0;
 };
 

@@ -14,4 +14,10 @@
 // Sets the number of samples by which the CFIR filter output is delayed.
 // Lower values reduce latency but result in less accurate phase approximation.
 #define CFIR_DELAY_SAMPLES 50
+
+//Output Midi Channel
+#define MIDI_OUTPUT_CHANNEL 1
+
+//Output Control Change (CC) number
+#define MIDI_OUTPUT_CC 74
 #endif //AUDIO_NEURO_MOD_MACROS_H

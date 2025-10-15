@@ -18,7 +18,6 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(liblsl)
 
-
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Source)
 
 set(SourceFiles

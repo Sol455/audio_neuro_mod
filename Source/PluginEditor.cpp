@@ -102,7 +102,7 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     addAndMakeVisible(desiredPhaseInput);
 
     // Brain frequency input
-    brainFreqLabel.setText("Brain Freq (Hz):", juce::dontSendNotification);
+    brainFreqLabel.setText("Alpha Freq (Hz):", juce::dontSendNotification);
     addAndMakeVisible(brainFreqLabel);
 
     brainFreqInput.setMultiLine(false);
