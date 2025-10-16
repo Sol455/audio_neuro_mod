@@ -1,5 +1,15 @@
 # Audio Neuromod
 
+## Table of Contents
+- [Overview](#overview)
+- [Building, Installation & Development](#building-installation--development)
+- [Using the Plugin](#using-the-plugin)
+- [Latency, Compensation & Phase](#latency-compensation--phase)
+- [MIDI Output](#midi-output)
+- [Recommended Experimental Setup](#reccomended-experimental-set-up)
+- [To-Do](#todo)
+
+
 ### Overview
 
 ---
@@ -10,11 +20,15 @@ A **JUCE plugin** that analyses **alpha-band EEG activity** and generates **phas
 ```mermaid
 graph LR
     A[EEG Hardware] --> B[LSL Bridge]
-    B --> C[Plugin Application]
-    C --> D[LSL Input]
-    D --> E[CFIR modulation signal generation]
-    E --> F[Phase Compensation]
-    F --> G[Audio Output]
+    B --> D[LSL Input]
+
+    subgraph C[Neuromodulation Plugin]
+        style C fill:#f9f9f9,stroke:#888,stroke-dasharray: 3 3
+        D --> E[CFIR Modulation Signal Generation]
+        E --> F[Phase Compensation]
+        F --> G[Convolution with carrier oscillator]
+    end
+    G --> H[Audio Output]
 ```
 
 This project uses **[Lab Streaming Layer (LSL)](https://github.com/sccn/labstreaminglayer)** as a data inlet to remain **hardware-agnostic** and support a variety of EEG capture systems.
@@ -33,15 +47,25 @@ For setups using the **g.USBamp**, it is recommended to use the  **[g.USBamp LSL
 Detailed hardware configuration and driver setup instructions are available in a **private repository**.  
 Contact: [sol@glowinthedark.co.uk](mailto:sol@glowinthedark.co.uk)
 
----
-
 ### Building, Installation & Development
 
-This plugin is built with the **[JUCE Framework](https://github.com/juce-framework/JUCE)** and automatically fetches **liblsl v1.16.2** during setup.
+---
 
-**Recommended IDE:** [CLion](https://www.jetbrains.com/clion/)  
+### Requirements
 
-The plugin can be built as a standalone audio application (reccomended) or VST3/AU for running from within a DAW.
+- JUCE 7.0+
+- liblsl v1.16.2 (automatically fetched)
+- CMake 3.20+
+- [CLion](https://www.jetbrains.com/clion/)  (recommended) or Visual Studio Code for development
+- Tested on macOS 13+ and Windows 10+
+
+The plugin can be built as a standalone audio application (reccomended) or VST3 for running from within a DAW.
+
+### Pre-built downloads:
+
+View the releases page:
+
+### Building from source:
 
 ### Using the plugin
 
@@ -144,6 +168,10 @@ The output channel and CC number are set in `macros.h` using `MIDI_OUTPUT_CHANNE
 
 **Recommended setup (Ableton Live):**  
 Create a virtual MIDI port, run the plugin in standalone mode, and select that virtual port as an input inside Ableton Live.
+
+### DSP
+
+
 
 ### Reccomended experimental Set-up
 Use Lab recorder to record the Live Midi

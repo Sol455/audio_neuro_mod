@@ -111,17 +111,41 @@ target_link_libraries(${PROJECT_NAME}
 )
 
 if (WIN32)
-    # Copy lsl.dll to the main plugin output folder
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    # Copy lsl.dll next to the Standalone EXE
+    add_custom_command(TARGET ${PROJECT_NAME}_Standalone POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
             $<TARGET_FILE:lsl>
-            $<TARGET_FILE_DIR:${PROJECT_NAME}>
+            $<TARGET_FILE_DIR:${PROJECT_NAME}_Standalone>
     )
 
-    # Copy lsl.dll to the Standalone plugin output folder
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    # Copy lsl.dll next to the VST3 binary (inside the .vst3 bundle)
+    add_custom_command(TARGET ${PROJECT_NAME}_VST3 POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
             $<TARGET_FILE:lsl>
-            $<TARGET_FILE_DIR:${PROJECT_NAME}>/Standalone
+            $<TARGET_FILE_DIR:${PROJECT_NAME}_VST3>
     )
+endif()
+
+if(APPLE)
+    # Helper to add RPATH + copy for a given target if it exists
+    function(bundle_lsl_for targetname)
+        if(TARGET ${targetname})
+            # Ensure the binary looks in Contents/Frameworks at runtime
+            set_target_properties(${targetname} PROPERTIES
+                    BUILD_RPATH "@loader_path/../Frameworks")
+
+            # Create Frameworks/ and copy liblsl.dylib into the bundle
+            add_custom_command(TARGET ${targetname} POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E make_directory
+                    "$<TARGET_FILE_DIR:${targetname}>/../Frameworks"
+                    COMMAND ${CMAKE_COMMAND} -E copy
+                    $<TARGET_FILE:lsl>
+                    "$<TARGET_FILE_DIR:${targetname}>/../Frameworks/liblsl.dylib"
+                    COMMENT "Bundling liblsl.dylib into ${targetname}")
+        endif()
+    endfunction()
+
+    # Apply to JUCE targets (Standalone app + VST3)
+    bundle_lsl_for(${PROJECT_NAME}_Standalone)
+    bundle_lsl_for(${PROJECT_NAME}_VST3)
 endif()
