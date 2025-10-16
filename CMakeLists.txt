@@ -69,7 +69,7 @@ juce_add_plugin(${PROJECT_NAME}
         IS_MIDI_EFFECT FALSE
         EDITOR_WANTS_KEYBOARD_FOCUS FALSE
         JUCE_VST3_CAN_REPLACE_VST2 FALSE
-        COPY_PLUGIN_AFTER_BUILD TRUE
+        COPY_PLUGIN_AFTER_BUILD FALSE
         PLUGIN_MANUFACTURER_CODE Tap1
         PLUGIN_CODE Reg0
         FORMATS VST3 AU Standalone
@@ -118,7 +118,15 @@ if (WIN32)
             $<TARGET_FILE_DIR:${PROJECT_NAME}_Standalone>
     )
 
-    # Copy lsl.dll next to the VST3 binary (inside the .vst3 bundle)
+    # Copy lsl.dll to build root 
+    add_custom_command(TARGET ${PROJECT_NAME}_VST3 PRE_LINK
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_FILE:lsl>
+            "${CMAKE_CURRENT_BINARY_DIR}/lsl.dll"
+            COMMENT "Copying lsl.dll to build root for juce_vst3_helper"
+    )
+
+    # Also copy to the VST3 bundle for runtime
     add_custom_command(TARGET ${PROJECT_NAME}_VST3 POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
             $<TARGET_FILE:lsl>
