@@ -22,7 +22,7 @@
 #define CFIR_ALPHA_BAND_LOW 8.0f
 #define CFIR_ALPHA_BAND_HIGH 12.0f
 
-//Define number of taps 
+//Define number of taps
 #define CFIR_N_TAPS 500
 #define CFIR_N_FFT 2000
 
