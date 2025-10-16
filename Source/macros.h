@@ -11,9 +11,21 @@
 // 40 ms is a conservative default for most configurations, with high sample rates and single sample frame sizes this could be lowered significantly.
 #define LSL_JITTER_BUF_DELAY_MS 40
 
+
+//CFIR Filter Design
+
 // Sets the number of samples by which the CFIR filter output is delayed.
 // Lower values reduce latency but result in less accurate phase approximation.
 #define CFIR_DELAY_SAMPLES 50
+
+//define the alpha band for the CFIR filter
+#define CFIR_ALPHA_BAND_LOW 8.0f
+#define CFIR_ALPHA_BAND_HIGH 12.0f
+
+//Define number of taps 
+#define CFIR_N_TAPS 500
+#define CFIR_N_FFT 2000
+
 
 //Output Midi Channel
 #define MIDI_OUTPUT_CHANNEL 1

@@ -7,7 +7,7 @@
 void filterMod::prepare (double fs, double centreHz, double Q)
 {
     fs_ = fs;
-    cf_.prepare(8.0, 12.0, fs, CFIR_DELAY_SAMPLES, 500, 2000); // prepare complex filter @TO-DO have the alpha band measured and set per subject.
+    cf_.prepare(CFIR_ALPHA_BAND_LOW, CFIR_ALPHA_BAND_HIGH, fs, CFIR_DELAY_SAMPLES, CFIR_N_TAPS, CFIR_N_FFT); // prepare complex filter @TO-DO have the alpha band measured and set per subject.
 
     auto coeffs = juce::dsp::IIR::Coefficients<float>::makeHighPass(fs, HP_FREQ);
     dcBlocker.coefficients = coeffs;
