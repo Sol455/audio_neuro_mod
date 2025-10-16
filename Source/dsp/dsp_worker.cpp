@@ -18,7 +18,12 @@ void DSPWorker::process (const EegSample& sample_in)
 
     //COMPLEX processing
     float input_sample = sample_in.value;
-    float bias_removed_sample = filtermod.processDCBlock(input_sample);  // Remove DC bias
+    float bias_removed_sample;
+    if constexpr (HP_ENABLE) {
+        bias_removed_sample = filtermod.processDCBlock(input_sample);  // Remove DC bias
+    } else {
+        bias_removed_sample = input_sample;  //leave in DC bias
+    }
     const EegSample dc_removed_out { bias_removed_sample, sample_in.stamp };
 
     percentile.addSample(bias_removed_sample);

@@ -20,4 +20,9 @@
 
 //Output Control Change (CC) number
 #define MIDI_OUTPUT_CC 74
+
+//DC BIAS removal
+#define HP_ENABLE true
+#define HP_FREQ 1.0f
+
 #endif //AUDIO_NEURO_MOD_MACROS_H
